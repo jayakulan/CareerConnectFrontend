@@ -1,0 +1,133 @@
+.users-container {
+    padding: 1rem;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.users-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.users-table-container {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th {
+    background: #f9fafb;
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.users-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+.users-table tr:hover {
+    background: #f9fafb;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1e40af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.user-info h4 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.user-info p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.role-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.role-seeker {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.role-company {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.role-admin {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.action-menu {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-sm:hover {
+    background: #f3f4f6;
+}
+
+.btn-delete {
+    color: #dc2626;
+    border-color: #fee2e2;
+}
+
+.btn-delete:hover {
+    background: #fee2e2;
+}

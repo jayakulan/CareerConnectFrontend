@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
+import "./landingpage.css";
 
 function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo */}
-        <div className="navbar-logo">
+        <Link to="/" className="navbar-logo">
           <div className="navbar-logo-circle">C</div>
           <span className="navbar-logo-text">CareerConnect</span>
-        </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <div className="navbar-nav">

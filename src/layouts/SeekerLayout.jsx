@@ -1,52 +1,299 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Briefcase, User, FileText, LogOut, Sparkles } from 'lucide-react';
+import Dashboard from '../pages/seeker/Dashboard';
+import Jobs from '../pages/seeker/Jobs';
+import Profile from '../pages/seeker/Profile';
+import AIResumeCheck from '../pages/seeker/AIResumeCheck';
 
 const SeekerLayout = () => {
+  const location = useLocation();
+  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+    window.location.href = '/';
+  };
+
+  const navItems = [
+    { path: '/seeker/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/seeker/jobs', icon: Briefcase, label: 'Find Jobs' },
+    { path: '/seeker/ai-resume', icon: Sparkles, label: 'AI Resume Check' },
+    { path: '/seeker/profile', icon: User, label: 'My Profile' },
+  ];
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="seeker-layout">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-md">
-        <div className="p-4 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-800">Job Seeker</h1>
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <div className="logo">
+            <div className="logo-icon">C</div>
+            <span className="logo-text">CareerConnect</span>
+          </div>
         </div>
-        <nav className="mt-4">
-          <a href="/seeker/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Dashboard</a>
-          <a href="/seeker/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Profile</a>
-          <a href="/seeker/jobs" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Find Jobs</a>
-          <a href="/seeker/applications" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Applications</a>
-          <a href="/seeker/saved" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Saved Jobs</a>
+
+        <nav className="sidebar-nav">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`nav-item ${isActive ? 'active' : ''}`}
+              >
+                <Icon size={20} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
-      </div>
+
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between p-4">
-            <h2 className="text-lg font-medium text-gray-800">Job Seeker Dashboard</h2>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <span className="sr-only">Notifications</span>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-              </button>
-              <div className="relative">
-                <button className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-gray-700">Job Seeker</span>
-                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
-                    JS
-                  </div>
-                </button>
+      <div className="main-content">
+        <header className="top-header">
+          <div className="header-left">
+            <h2 className="header-title">Job Seeker Portal</h2>
+          </div>
+          <div className="header-right">
+            <div className="user-menu">
+              <div className="user-avatar">
+                {userInfo.name?.charAt(0) || 'JS'}
+              </div>
+              <div className="user-info">
+                <span className="user-name">{userInfo.name || 'Job Seeker'}</span>
+                <span className="user-role">Seeker</span>
               </div>
             </div>
           </div>
         </header>
-        
-        {/* Page Content */}
-        <main className="p-6">
-          <Outlet />
+
+        <main className="page-content">
+          <Routes>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="jobs" element={<Jobs />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="ai-resume" element={<AIResumeCheck />} />
+          </Routes>
         </main>
       </div>
+
+      <style jsx>{`
+        .seeker-layout {
+          display: flex;
+          min-height: 100vh;
+          background: #f9fafb;
+        }
+
+        .sidebar {
+          width: 280px;
+          background: linear-gradient(180deg, #1a202c 0%, #0f1419 100%);
+          display: flex;
+          flex-direction: column;
+          position: fixed;
+          height: 100vh;
+          left: 0;
+          top: 0;
+          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+          padding: 24px 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .logo-icon {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+          font-size: 20px;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .logo-text {
+          font-size: 20px;
+          font-weight: 800;
+          color: white;
+        }
+
+        .sidebar-nav {
+          flex: 1;
+          padding: 20px 0;
+          overflow-y: auto;
+        }
+
+        .nav-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 20px;
+          margin: 4px 12px;
+          color: rgba(255, 255, 255, 0.7);
+          text-decoration: none;
+          border-radius: 10px;
+          transition: all 0.3s ease;
+          font-weight: 500;
+        }
+
+        .nav-item:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          transform: translateX(4px);
+        }
+
+        .nav-item.active {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .sidebar-footer {
+          padding: 20px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          padding: 14px 20px;
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 10px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+          background: rgba(239, 68, 68, 0.2);
+          border-color: #ef4444;
+        }
+
+        .main-content {
+          flex: 1;
+          margin-left: 280px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .top-header {
+          background: white;
+          padding: 20px 32px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        .header-title {
+          font-size: 24px;
+          font-weight: 700;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .user-menu {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 16px;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+          border-radius: 12px;
+          border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .user-avatar {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+          font-size: 16px;
+        }
+
+        .user-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .user-name {
+          font-size: 14px;
+          font-weight: 700;
+          color: #1a202c;
+        }
+
+        .user-role {
+          font-size: 12px;
+          color: #6b7280;
+        }
+
+        .page-content {
+          flex: 1;
+          overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+          .sidebar {
+            width: 70px;
+          }
+
+          .sidebar-header,
+          .sidebar-footer {
+            padding: 20px 10px;
+          }
+
+          .logo-text,
+          .nav-item span,
+          .logout-btn span {
+            display: none;
+          }
+
+          .nav-item,
+          .logout-btn {
+            justify-content: center;
+          }
+
+          .main-content {
+            margin-left: 70px;
+          }
+
+          .user-info {
+            display: none;
+          }
+        }
+      `}</style>
     </div>
   );
 };

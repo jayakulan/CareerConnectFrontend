@@ -1,0 +1,139 @@
+.admin-dashboard {
+    font-family: 'Inter', sans-serif;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+}
+
+.admin-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    background: linear-gradient(to right, #2563eb, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.admin-subtitle {
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.admin-stat-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #2563eb;
+    transition: transform 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.admin-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.admin-stat-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.admin-stat-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.activity-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+}
+
+.icon-user {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.icon-company {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.icon-job {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}

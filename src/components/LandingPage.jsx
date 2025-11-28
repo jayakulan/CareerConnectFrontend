@@ -1,9 +1,9 @@
 "use client"
 
 import { Link } from "react-router-dom";
-import { Users, Briefcase, Shield, Facebook, Twitter, Linkedin } from "lucide-react"
-import "./landingpage.css"
+import { Users, Briefcase, Shield, Facebook, Twitter, Linkedin, ArrowRight, CheckCircle } from "lucide-react"
 import Navbar from "./Navbar";
+import "./landingpage.css";
 
 // ===== TESTIMONIALS DATA =====
 const testimonials = [
@@ -38,16 +38,19 @@ const roles = [
     icon: Users,
     title: "For Job Seekers",
     description: "Find and apply for your next job with ease. Let us connect you with your dream company.",
+    iconClass: "role-card-icon-blue",
   },
   {
     icon: Briefcase,
     title: "For Companies",
     description: "Post jobs and find the best talent. Our platform makes hiring simple and efficient.",
+    iconClass: "role-card-icon-purple",
   },
   {
     icon: Shield,
     title: "For Admins",
     description: "Manage the platform, oversee settings, and ensure a seamless experience for all users.",
+    iconClass: "role-card-icon-indigo",
   },
 ]
 
@@ -75,49 +78,77 @@ function Hero() {
       <div className="hero-container">
         {/* Left Content */}
         <div className="hero-content">
-          <h1 className="hero-title">Find Your Dream Job or Candidate</h1>
+          <div className="hero-badge">
+            <span className="pulse-dot">
+              <span className="pulse-dot-inner"></span>
+              <span className="pulse-dot-outer"></span>
+            </span>
+            #1 Job Portal for Tech Talent
+          </div>
+          <h1 className="hero-title">
+            Find Your <span className="hero-title-gradient">Dream Job</span> or Candidate
+          </h1>
           <p className="hero-description">
             Connecting top talent with leading companies. Whether you're searching for your next opportunity or looking
             to hire, we're here to help.
           </p>
           <div className="hero-buttons">
-            <button className="btn btn-large btn-primary">Browse Jobs</button>
-            <button className="btn btn-large btn-outline">Post a Job</button>
+            <Link to="/signup/seeker" className="btn btn-large btn-primary">
+              Browse Jobs <ArrowRight size={20} />
+            </Link>
+            <Link to="/signup/company" className="btn btn-large btn-outline">
+              Post a Job
+            </Link>
+          </div>
+          <div className="hero-features">
+            <div className="hero-feature">
+              <CheckCircle size={20} style={{ color: '#10b981' }} />
+              <span>Verified Companies</span>
+            </div>
+            <div className="hero-feature">
+              <CheckCircle size={20} style={{ color: '#10b981' }} />
+              <span>AI-Powered Matching</span>
+            </div>
           </div>
         </div>
 
         {/* Right Illustration */}
         <div className="hero-illustration">
-          <div className="illustration-box">
-            {/* Network dots illustration */}
-            <svg className="illustration-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.1" />
-                </filter>
-              </defs>
+          <div className="hero-illustration-inner">
+            <div className="blob blob-purple"></div>
+            <div className="blob blob-yellow"></div>
+            <div className="blob blob-pink"></div>
+            <div className="illustration-box">
+              {/* Network dots illustration */}
+              <svg className="illustration-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.1" />
+                  </filter>
+                </defs>
 
-              {/* Connection lines */}
-              <line x1="80" y1="100" x2="150" y2="150" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="150" y1="150" x2="220" y2="120" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="150" y1="150" x2="180" y2="250" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="220" y1="120" x2="280" y2="200" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="280" y1="200" x2="300" y2="300" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="180" y1="250" x2="280" y2="200" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="100" y1="300" x2="180" y2="250" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-              <line x1="100" y1="300" x2="300" y2="300" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                {/* Connection lines */}
+                <line x1="80" y1="100" x2="150" y2="150" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="150" y1="150" x2="220" y2="120" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="150" y1="150" x2="180" y2="250" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="220" y1="120" x2="280" y2="200" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="280" y1="200" x2="300" y2="300" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="180" y1="250" x2="280" y2="200" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="100" y1="300" x2="180" y2="250" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
+                <line x1="100" y1="300" x2="300" y2="300" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
 
-              {/* Dots */}
-              <circle cx="80" cy="100" r="4" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="150" cy="150" r="5" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="220" cy="120" r="3.5" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="180" cy="250" r="4" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="280" cy="200" r="4.5" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="300" cy="300" r="3" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="100" cy="300" r="3.5" fill="#4b5563" filter="url(#shadow)" />
-              <circle cx="50" cy="80" r="2.5" fill="#4b5563" opacity="0.6" />
-              <circle cx="330" cy="140" r="3" fill="#4b5563" opacity="0.6" />
-            </svg>
+                {/* Dots */}
+                <circle cx="80" cy="100" r="6" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="150" cy="150" r="8" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="220" cy="120" r="5" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="180" cy="250" r="6" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="280" cy="200" r="7" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="300" cy="300" r="5" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="100" cy="300" r="6" fill="#4f46e5" filter="url(#shadow)" />
+                <circle cx="50" cy="80" r="3" fill="#9ca3af" opacity="0.6" />
+                <circle cx="330" cy="140" r="4" fill="#9ca3af" opacity="0.6" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -130,18 +161,24 @@ function RoleCards() {
   return (
     <section className="role-cards">
       <div className="role-cards-container">
-        {roles.map((role, index) => {
-          const Icon = role.icon
-          return (
-            <div key={index} className="role-card">
-              <div className="role-card-icon">
-                <Icon />
+        <div className="role-cards-header">
+          <h2 className="role-cards-title">Tailored for Everyone</h2>
+          <p className="role-cards-subtitle">Whether you're hiring or looking, we have the tools you need.</p>
+        </div>
+        <div className="role-cards-grid">
+          {roles.map((role, index) => {
+            const Icon = role.icon
+            return (
+              <div key={index} className="role-card">
+                <div className={`role-card-icon ${role.iconClass}`}>
+                  <Icon size={28} />
+                </div>
+                <h3 className="role-card-title">{role.title}</h3>
+                <p className="role-card-description">{role.description}</p>
               </div>
-              <h3 className="role-card-title">{role.title}</h3>
-              <p className="role-card-description">{role.description}</p>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </section>
   )
@@ -187,16 +224,24 @@ function Newsletter() {
   return (
     <section className="newsletter">
       <div className="newsletter-container">
-        <div className="newsletter-content">
-          <h2 className="newsletter-title">Stay Ahead in Your Career</h2>
-          <p className="newsletter-description">
-            Subscribe to our newsletter for the latest job alerts, career tips, and industry insights.
-          </p>
-        </div>
-
-        <div className="newsletter-form">
-          <input type="email" placeholder="Enter your email" className="newsletter-input" />
-          <button className="btn btn-subscribe">Subscribe</button>
+        <div className="newsletter-inner">
+          <div className="newsletter-pattern"></div>
+          <div className="newsletter-content">
+            <h2 className="newsletter-title">Stay Ahead in Your Career</h2>
+            <p className="newsletter-description">
+              Subscribe to our newsletter for the latest job alerts, career tips, and industry insights.
+            </p>
+            <div className="newsletter-form">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="newsletter-input"
+              />
+              <button className="btn btn-subscribe">
+                Subscribe
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -216,7 +261,9 @@ function Footer() {
               <div className="footer-brand-circle">C</div>
               <span className="footer-brand-text">CareerConnect</span>
             </div>
-            <p className="footer-brand-description">Connecting talent with opportunity.</p>
+            <p className="footer-brand-description">
+              Connecting talent with opportunity. The #1 platform for modern professionals.
+            </p>
           </div>
 
           {/* Company */}
@@ -225,7 +272,7 @@ function Footer() {
             <ul className="footer-links">
               {footerLinks.company.map((link, index) => (
                 <li key={index} className="footer-link">
-                  <Link href={link.href}>{link.label}</Link>
+                  <Link to={link.href}>{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -237,7 +284,7 @@ function Footer() {
             <ul className="footer-links">
               {footerLinks.legal.map((link, index) => (
                 <li key={index} className="footer-link">
-                  <Link href={link.href}>{link.label}</Link>
+                  <Link to={link.href}>{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -249,7 +296,7 @@ function Footer() {
             <ul className="footer-links">
               {footerLinks.resources.map((link, index) => (
                 <li key={index} className="footer-link">
-                  <Link href={link.href}>{link.label}</Link>
+                  <Link to={link.href}>{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -262,14 +309,14 @@ function Footer() {
 
           {/* Social Icons */}
           <div className="footer-socials">
-            <Link href="#" className="footer-social-link">
-              <Twitter />
+            <Link to="#" className="footer-social-link">
+              <Twitter size={20} />
             </Link>
-            <Link href="#" className="footer-social-link">
-              <Facebook />
+            <Link to="#" className="footer-social-link">
+              <Facebook size={20} />
             </Link>
-            <Link href="#" className="footer-social-link">
-              <Linkedin />
+            <Link to="#" className="footer-social-link">
+              <Linkedin size={20} />
             </Link>
           </div>
         </div>
