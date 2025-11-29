@@ -1,284 +1,88 @@
 import React, { useState } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
+import './Users.css';
 
 const Users = () => {
-    const [users, setUsers] = useState([
-        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'seeker', status: 'Active', joinDate: '2023-11-01' },
-        { id: 2, name: 'TechCorp Inc.', email: 'contact@techcorp.com', role: 'company', status: 'Active', joinDate: '2023-10-15' },
-        { id: 3, name: 'Jane Smith', email: 'jane@example.com', role: 'seeker', status: 'Inactive', joinDate: '2023-11-05' },
-        { id: 4, name: 'Admin User', email: 'admin@careerconnect.com', role: 'admin', status: 'Active', joinDate: '2023-09-01' },
-        { id: 5, name: 'StartupHub', email: 'hello@startuphub.io', role: 'company', status: 'Pending', joinDate: '2023-11-20' },
-    ]);
+  const [users, setUsers] = useState([
+    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'seeker', status: 'Active', joinDate: '2023-11-01' },
+    { id: 2, name: 'TechCorp Inc.', email: 'contact@techcorp.com', role: 'company', status: 'Active', joinDate: '2023-10-15' },
+    { id: 3, name: 'Jane Smith', email: 'jane@example.com', role: 'seeker', status: 'Inactive', joinDate: '2023-11-05' },
+    { id: 4, name: 'Admin User', email: 'admin@careerconnect.com', role: 'admin', status: 'Active', joinDate: '2023-09-01' },
+    { id: 5, name: 'StartupHub', email: 'hello@startuphub.io', role: 'company', status: 'Pending', joinDate: '2023-11-20' },
+  ]);
 
-    const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            setUsers(users.filter(user => user.id !== id));
-        }
-    };
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      setUsers(users.filter(user => user.id !== id));
+    }
+  };
 
-    return (
-        <div className="users-container">
-            <div className="users-header">
-                <h1 className="users-title">User Management</h1>
-                <button className="btn-add">Add New User</button>
-            </div>
+  return (
+    <div className="users-container">
+      <div className="users-header">
+        <h1 className="users-title">User Management</h1>
+        <button className="btn-add">Add New User</button>
+      </div>
 
-            <div className="users-table-container">
-                <table className="users-table">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Joined Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user) => (
-                            <tr key={user.id}>
-                                <td>
-                                    <div className="user-cell">
-                                        <div className="user-avatar">
-                                            {user.name.charAt(0)}
-                                        </div>
-                                        <div className="user-info">
-                                            <h4 className="user-name">{user.name}</h4>
-                                            <p className="user-email">{user.email}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className={`role-badge role-${user.role}`}>
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span className={`status-badge status-${user.status.toLowerCase()}`}>
-                                        {user.status}
-                                    </span>
-                                </td>
-                                <td>{user.joinDate}</td>
-                                <td>
-                                    <div className="action-menu">
-                                        <button className="btn-icon btn-edit" title="Edit">
-                                            <Edit size={16} />
-                                        </button>
-                                        <button
-                                            className="btn-icon btn-delete"
-                                            onClick={() => handleDelete(user.id)}
-                                            title="Delete"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+      <div className="users-table-container">
+        <table className="users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>
+                  <div className="user-cell">
+                    <div className="user-avatar">
+                      {user.name.charAt(0)}
+                    </div>
+                    <div className="user-info">
+                      <h4 className="user-name">{user.name}</h4>
+                      <p className="user-email">{user.email}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className={`role-badge role-${user.role}`}>
+                    {user.role}
+                  </span>
+                </td>
+                <td>
+                  <span className={`status-badge status-${user.status.toLowerCase()}`}>
+                    {user.status}
+                  </span>
+                </td>
+                <td>{user.joinDate}</td>
+                <td>
+                  <div className="action-menu">
+                    <button className="btn-icon btn-edit" title="Edit">
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="btn-icon btn-delete"
+                      onClick={() => handleDelete(user.id)}
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-            <style jsx>{`
-        .users-container {
-          padding: 24px;
-        }
 
-        .users-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 24px;
-        }
-
-        .users-title {
-          font-size: 28px;
-          font-weight: 700;
-          color: #1a202c;
-        }
-
-        .btn-add {
-          padding: 12px 24px;
-          background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-add:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-
-        .users-table-container {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-        }
-
-        .users-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        .users-table th {
-          background: #f9fafb;
-          padding: 16px;
-          text-align: left;
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-          color: #718096;
-          border-bottom: 1px solid #e5e7eb;
-        }
-
-        .users-table td {
-          padding: 16px;
-          border-bottom: 1px solid #f3f4f6;
-          color: #4b5563;
-        }
-
-        .users-table tr:hover {
-          background: #f9fafb;
-        }
-
-        .users-table tr:last-child td {
-          border-bottom: none;
-        }
-
-        .user-cell {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .user-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 600;
-          font-size: 16px;
-        }
-
-        .user-info {
-          flex: 1;
-        }
-
-        .user-name {
-          font-size: 14px;
-          font-weight: 600;
-          color: #1a202c;
-          margin: 0 0 4px 0;
-        }
-
-        .user-email {
-          font-size: 12px;
-          color: #718096;
-          margin: 0;
-        }
-
-        .role-badge {
-          padding: 4px 12px;
-          border-radius: 9999px;
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: capitalize;
-          display: inline-block;
-        }
-
-        .role-seeker {
-          background: #e0e7ff;
-          color: #4338ca;
-        }
-
-        .role-company {
-          background: #fce7f3;
-          color: #be185d;
-        }
-
-        .role-admin {
-          background: #d1fae5;
-          color: #047857;
-        }
-
-        .status-badge {
-          padding: 4px 12px;
-          border-radius: 9999px;
-          font-size: 12px;
-          font-weight: 600;
-          display: inline-block;
-        }
-
-        .status-active {
-          background: #d1fae5;
-          color: #065f46;
-        }
-
-        .status-inactive {
-          background: #f3f4f6;
-          color: #6b7280;
-        }
-
-        .status-pending {
-          background: #fef3c7;
-          color: #92400e;
-        }
-
-        .action-menu {
-          display: flex;
-          gap: 8px;
-        }
-
-        .btn-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          border: 1px solid #e5e7eb;
-          background: white;
-          color: #6b7280;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .btn-icon:hover {
-          background: #f9fafb;
-          border-color: #d1d5db;
-        }
-
-        .btn-edit:hover {
-          color: #3b82f6;
-          border-color: #3b82f6;
-        }
-
-        .btn-delete {
-          color: #dc2626;
-        }
-
-        .btn-delete:hover {
-          background: #fee2e2;
-          border-color: #dc2626;
-        }
-
-        @media (max-width: 768px) {
-          .users-table-container {
-            overflow-x: auto;
-          }
-        }
-      `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default Users;

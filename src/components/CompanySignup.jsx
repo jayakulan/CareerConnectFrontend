@@ -14,10 +14,9 @@ const CompanySignup = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        website: '',
+        phone: '',
+        address: '',
         industry: '',
-        companySize: '',
-        description: '',
     });
 
     const handleChange = (e) => {
@@ -44,6 +43,9 @@ const CompanySignup = () => {
                 name: formData.companyName,
                 email: formData.email,
                 password: formData.password,
+                phone: formData.phone,
+                address: formData.address,
+                industry: formData.industry,
                 role: 'company',
             });
 
@@ -59,144 +61,169 @@ const CompanySignup = () => {
 
     return (
         <div className="company-signup-container">
-            <div className="signup-card">
-                <div className="signup-header">
-                    <div className="signup-logo">
-                        <Building2 size={32} />
-                    </div>
-                    <h1 className="signup-title">Create Company Account</h1>
-                    <p className="signup-subtitle">Join CareerConnect and find top talent</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="signup-form">
-                    <div className="form-group">
-                        <label className="form-label">Company Name *</label>
-                        <input
-                            type="text"
-                            name="companyName"
-                            className="form-input"
-                            placeholder="Enter your company name"
-                            value={formData.companyName}
-                            onChange={handleChange}
-                            required
-                        />
+            {/* Left Side - Form */}
+            <div className="signup-left">
+                <div className="signup-form-wrapper">
+                    <div className="signup-header">
+                        <div className="signup-logo">
+                            <Building2 size={28} />
+                        </div>
+                        <h1 className="signup-title">Hire Top Talent</h1>
+                        <p className="signup-subtitle">Post jobs and connect with the best candidates for your team.</p>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Email Address *</label>
-                        <input
-                            type="email"
-                            name="email"
-                            className="form-input"
-                            placeholder="company@example.com"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="signup-form">
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Company Name *</label>
+                                <input
+                                    type="text"
+                                    name="companyName"
+                                    className="form-input"
+                                    placeholder="Your Company"
+                                    value={formData.companyName}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Password *</label>
-                        <div className="password-input-wrapper">
-                            <input
-                                type={showPassword ? 'text' : 'password'}
-                                name="password"
-                                className="form-input"
-                                placeholder="Create a strong password"
-                                value={formData.password}
+                            <div className="form-group">
+                                <label className="form-label">Email Address *</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    className="form-input"
+                                    placeholder="company@example.com"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Password *</label>
+                                <div className="password-input-wrapper">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="password"
+                                        className="form-input"
+                                        placeholder="Min. 6 characters"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        className="password-toggle"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Confirm Password *</label>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    className="form-input"
+                                    placeholder="Re-enter password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Phone Number</label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    className="form-input"
+                                    placeholder="+1 (555) 000-0000"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Address</label>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    className="form-input"
+                                    placeholder="City, State"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Industry</label>
+                            <select
+                                name="industry"
+                                className="form-select"
+                                value={formData.industry}
                                 onChange={handleChange}
-                                required
-                            />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => setShowPassword(!showPassword)}
                             >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
+                                <option value="">Select Industry</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Education">Education</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" className="submit-btn" disabled={loading}>
+                            {loading ? 'Creating Account...' : 'Create Company Account'}
+                        </button>
+                    </form>
+
+                    <div className="login-link">
+                        Already have an account? <Link to="/login">Sign In</Link>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Side - Visual/Branding */}
+            <div className="signup-right">
+                <div className="signup-visual-content">
+                    <h2 className="visual-title">Find Your Perfect Candidates</h2>
+                    <p className="visual-description">
+                        Join leading companies using CareerConnect to build exceptional teams
+                    </p>
+                    <div className="visual-features">
+                        <div className="visual-feature">
+                            <div className="feature-icon">🎯</div>
+                            <div className="feature-text">
+                                <h3>Smart Candidate Matching</h3>
+                                <p>AI-powered screening to find the best fit for your roles</p>
+                            </div>
+                        </div>
+                        <div className="visual-feature">
+                            <div className="feature-icon">📊</div>
+                            <div className="feature-text">
+                                <h3>Analytics Dashboard</h3>
+                                <p>Track applications and hiring metrics in real-time</p>
+                            </div>
+                        </div>
+                        <div className="visual-feature">
+                            <div className="feature-icon">⚡</div>
+                            <div className="feature-text">
+                                <h3>Quick Hiring Process</h3>
+                                <p>Streamline your recruitment with our ATS system</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Confirm Password *</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            className="form-input"
-                            placeholder="Re-enter your password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Website</label>
-                        <input
-                            type="url"
-                            name="website"
-                            className="form-input"
-                            placeholder="https://yourcompany.com"
-                            value={formData.website}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Industry</label>
-                        <select
-                            name="industry"
-                            className="form-select"
-                            value={formData.industry}
-                            onChange={handleChange}
-                        >
-                            <option value="">Select Industry</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Finance">Finance</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="Education">Education</option>
-                            <option value="Retail">Retail</option>
-                            <option value="Manufacturing">Manufacturing</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Company Size</label>
-                        <select
-                            name="companySize"
-                            className="form-select"
-                            value={formData.companySize}
-                            onChange={handleChange}
-                        >
-                            <option value="">Select Company Size</option>
-                            <option value="1-10">1-10 employees</option>
-                            <option value="11-50">11-50 employees</option>
-                            <option value="51-200">51-200 employees</option>
-                            <option value="201-500">201-500 employees</option>
-                            <option value="501-1000">501-1000 employees</option>
-                            <option value="1000+">1000+ employees</option>
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Company Description</label>
-                        <textarea
-                            name="description"
-                            className="form-textarea"
-                            placeholder="Tell us about your company..."
-                            value={formData.description}
-                            onChange={handleChange}
-                        ></textarea>
-                    </div>
-
-                    <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Create Company Account'}
-                    </button>
-                </form>
-
-                <div className="login-link">
-                    Already have an account? <Link to="/login">Sign In</Link>
                 </div>
             </div>
         </div>

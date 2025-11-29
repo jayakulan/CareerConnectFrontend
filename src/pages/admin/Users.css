@@ -1,25 +1,40 @@
 .users-container {
-    padding: 1rem;
-    animation: fadeIn 0.5s ease-in-out;
+    padding: 24px;
 }
 
 .users-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 24px;
 }
 
 .users-title {
-    font-size: 1.5rem;
+    font-size: 28px;
     font-weight: 700;
-    color: #1f2937;
+    color: #1a202c;
+}
+
+.btn-add {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .users-table-container {
     background: white;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -30,63 +45,72 @@
 
 .users-table th {
     background: #f9fafb;
-    padding: 1rem;
+    padding: 16px;
     text-align: left;
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    color: #6b7280;
+    color: #718096;
     border-bottom: 1px solid #e5e7eb;
 }
 
 .users-table td {
-    padding: 1rem;
+    padding: 16px;
     border-bottom: 1px solid #f3f4f6;
-    color: #374151;
+    color: #4b5563;
 }
 
 .users-table tr:hover {
     background: #f9fafb;
 }
 
+.users-table tr:last-child td {
+    border-bottom: none;
+}
+
 .user-cell {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 12px;
 }
 
 .user-avatar {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: #dbeafe;
-    color: #1e40af;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 16px;
 }
 
-.user-info h4 {
-    margin: 0;
-    font-size: 0.875rem;
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-size: 14px;
     font-weight: 600;
-    color: #1f2937;
+    color: #1a202c;
+    margin: 0 0 4px 0;
 }
 
-.user-info p {
+.user-email {
+    font-size: 12px;
+    color: #718096;
     margin: 0;
-    font-size: 0.75rem;
-    color: #6b7280;
 }
 
 .role-badge {
-    padding: 0.25rem 0.5rem;
+    padding: 4px 12px;
     border-radius: 9999px;
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 600;
     text-transform: capitalize;
+    display: inline-block;
 }
 
 .role-seeker {
@@ -104,30 +128,69 @@
     color: #047857;
 }
 
-.action-menu {
-    display: flex;
-    gap: 0.5rem;
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
 }
 
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 0.25rem;
-    border: 1px solid #d1d5db;
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-inactive {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.action-menu {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
     background: white;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.btn-sm:hover {
-    background: #f3f4f6;
+.btn-icon:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.btn-edit:hover {
+    color: #3b82f6;
+    border-color: #3b82f6;
 }
 
 .btn-delete {
     color: #dc2626;
-    border-color: #fee2e2;
 }
 
 .btn-delete:hover {
     background: #fee2e2;
+    border-color: #dc2626;
+}
+
+@media (max-width: 768px) {
+    .users-table-container {
+        overflow-x: auto;
+    }
 }
