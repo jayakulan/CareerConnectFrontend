@@ -1,49 +1,89 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { Upload, FileText, Sparkles, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import './AIResumeCheck.css';
 
 const AIResumeCheck = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type === 'application/pdf') {
+        setSelectedFile(file);
+      } else {
+        alert('Please upload a PDF file.');
+      }
+    }
+  };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
   const handleAnalyze = async () => {
-    if (!selectedFile || !jobDescription) {
-      alert('Please upload a resume and enter a job description');
+    if ((!resumeText && !selectedFile) || !jobDescription) {
+      alert('Please provide a resume (upload or text) and job description');
       return;
     }
 
     setAnalyzing(true);
+    setAnalysis(null);
 
-    // Simulate AI analysis
-    setTimeout(() => {
-      setAnalysis({
-        matchPercentage: 85,
-        recommendation: 'Interview',
-        summary: 'Strong candidate with relevant experience in React and Node.js. Skills align well with job requirements.',
-        strengths: [
-          'Extensive experience with React and modern JavaScript',
-          'Strong background in full-stack development',
-          'Proven track record of delivering projects',
-          'Good understanding of cloud technologies',
-        ],
-        weaknesses: [
-          'Limited experience with TypeScript',
-          'No mention of testing frameworks',
-          'Could benefit from more DevOps knowledge',
-        ],
-        missingSkills: ['TypeScript', 'Jest', 'Docker', 'Kubernetes'],
+    const formData = new FormData();
+    if (selectedFile) formData.append('resumeFile', selectedFile);
+    if (resumeText) formData.append('resumeText', resumeText);
+    formData.append('jobDescription', jobDescription);
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/ai/analyze', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
+
+      let analysisData = response.data.analysis;
+
+      if (typeof analysisData === 'string') {
+        const cleanJson = analysisData.replace(/```json|```/g, "");
+        analysisData = JSON.parse(cleanJson);
+      }
+
+      const matchScore = analysisData.match_score || 0;
+      const derivedRecommendation = matchScore >= 80 ? 'Hire' : matchScore >= 60 ? 'Interview' : 'Reject';
+
+      setAnalysis({
+        matchPercentage: matchScore,
+        recommendation: derivedRecommendation,
+        summary: analysisData.verdict || "Analysis complete.",
+        strengths: analysisData.strengths || [],
+        weaknesses: analysisData.weaknesses || [],
+        missingSkills: analysisData.missing_keywords || []
+      });
+    } catch (error) {
+      console.error('Error analyzing resume:', error.response?.data || error.message);
+      alert(`Error: ${error.response?.data?.message || error.message}`);
+    } finally {
       setAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const getMatchColor = (percentage) => {
@@ -81,25 +121,45 @@ const AIResumeCheck = () => {
         {/* Upload Section */}
         <div className="upload-section">
           <div className="upload-card">
-            <h2 className="section-title">Upload Your Resume</h2>
-            <div className="file-upload-area">
+            <h2 className="section-title">Your Resume</h2>
+
+            {/* File Upload UI */}
+            <div
+              className={`file-upload-area ${isDragging ? 'dragging' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <input
                 type="file"
                 id="resume-upload"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileChange}
                 className="file-input"
+                accept=".pdf"
+                onChange={handleFileChange}
               />
               <label htmlFor="resume-upload" className="file-upload-label">
                 <Upload size={48} className="upload-icon" />
                 <div className="upload-text">
                   <p className="upload-main-text">
-                    {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
+                    {selectedFile ? selectedFile.name : "Click to upload or drag and drop"}
                   </p>
-                  <p className="upload-sub-text">PDF, DOC, DOCX (Max 5MB)</p>
+                  <p className="upload-sub-text">PDF (Max 5MB)</p>
                 </div>
               </label>
             </div>
+
+            <div style={{ textAlign: 'center', margin: '10px 0', color: '#6b7280' }}>OR</div>
+
+            <textarea
+              className="job-desc-textarea"
+              rows="6"
+              placeholder="Paste your resume text here..."
+              value={resumeText}
+              onChange={(e) => {
+                setResumeText(e.target.value);
+                setSelectedFile(null);
+              }}
+            />
           </div>
 
           <div className="job-desc-card">
@@ -116,7 +176,7 @@ const AIResumeCheck = () => {
           <button
             className="analyze-btn"
             onClick={handleAnalyze}
-            disabled={analyzing || !selectedFile || !jobDescription}
+            disabled={analyzing || (!resumeText && !selectedFile) || !jobDescription}
           >
             {analyzing ? (
               <>
@@ -239,8 +299,6 @@ const AIResumeCheck = () => {
           </div>
         )}
       </div>
-
-
     </div>
   );
 };

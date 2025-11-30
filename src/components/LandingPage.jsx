@@ -1,9 +1,14 @@
 "use client"
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Users, Briefcase, Shield, Facebook, Twitter, Linkedin, ArrowRight, CheckCircle } from "lucide-react"
 import Navbar from "./Navbar";
+import ContactUsPopup from "./ContactUsPopup";
+import InfoPopup from "./InfoPopup";
+import { aboutUsContent, termsOfServiceContent, privacyPolicyContent } from "./popupContent";
 import "./landingpage.css";
+import heroBg from "../assets/hero-bg.png";
 
 // ===== TESTIMONIALS DATA =====
 const testimonials = [
@@ -112,43 +117,12 @@ function Hero() {
           </div>
         </div>
 
+
+
         {/* Right Illustration */}
         <div className="hero-illustration">
           <div className="hero-illustration-inner">
-            <div className="blob blob-purple"></div>
-            <div className="blob blob-yellow"></div>
-            <div className="blob blob-pink"></div>
-            <div className="illustration-box">
-              {/* Network dots illustration */}
-              <svg className="illustration-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.1" />
-                  </filter>
-                </defs>
-
-                {/* Connection lines */}
-                <line x1="80" y1="100" x2="150" y2="150" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="150" y1="150" x2="220" y2="120" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="150" y1="150" x2="180" y2="250" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="220" y1="120" x2="280" y2="200" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="280" y1="200" x2="300" y2="300" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="180" y1="250" x2="280" y2="200" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="100" y1="300" x2="180" y2="250" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-                <line x1="100" y1="300" x2="300" y2="300" stroke="#4b5563" strokeWidth="1.5" opacity="0.4" />
-
-                {/* Dots */}
-                <circle cx="80" cy="100" r="6" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="150" cy="150" r="8" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="220" cy="120" r="5" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="180" cy="250" r="6" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="280" cy="200" r="7" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="300" cy="300" r="5" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="100" cy="300" r="6" fill="#4f46e5" filter="url(#shadow)" />
-                <circle cx="50" cy="80" r="3" fill="#9ca3af" opacity="0.6" />
-                <circle cx="330" cy="140" r="4" fill="#9ca3af" opacity="0.6" />
-              </svg>
-            </div>
+            <img src={heroBg} alt="CareerConnect Hero" className="hero-image" />
           </div>
         </div>
       </div>
@@ -249,7 +223,7 @@ function Newsletter() {
 }
 
 // ===== FOOTER COMPONENT =====
-function Footer() {
+function Footer({ onContactClick, onAboutClick, onTermsClick, onPrivacyClick }) {
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -272,7 +246,37 @@ function Footer() {
             <ul className="footer-links">
               {footerLinks.company.map((link, index) => (
                 <li key={index} className="footer-link">
-                  <Link to={link.href}>{link.label}</Link>
+                  {link.label === "Contact" ? (
+                    <button
+                      onClick={onContactClick}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      {link.label}
+                    </button>
+                  ) : link.label === "About Us" ? (
+                    <button
+                      onClick={onAboutClick}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <Link to={link.href}>{link.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -284,7 +288,37 @@ function Footer() {
             <ul className="footer-links">
               {footerLinks.legal.map((link, index) => (
                 <li key={index} className="footer-link">
-                  <Link to={link.href}>{link.label}</Link>
+                  {link.label === "Terms of Service" ? (
+                    <button
+                      onClick={onTermsClick}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      {link.label}
+                    </button>
+                  ) : link.label === "Privacy Policy" ? (
+                    <button
+                      onClick={onPrivacyClick}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <Link to={link.href}>{link.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -327,14 +361,83 @@ function Footer() {
 
 // ===== MAIN LANDING PAGE COMPONENT =====
 export default function LandingPage() {
+  const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
+  const [isAboutPopupOpen, setIsAboutPopupOpen] = useState(false);
+  const [isTermsPopupOpen, setIsTermsPopupOpen] = useState(false);
+  const [isPrivacyPopupOpen, setIsPrivacyPopupOpen] = useState(false);
+
+  const handleOpenContactPopup = () => {
+    setIsContactPopupOpen(true);
+  };
+
+  const handleCloseContactPopup = () => {
+    setIsContactPopupOpen(false);
+  };
+
+  const handleOpenAboutPopup = () => {
+    setIsAboutPopupOpen(true);
+  };
+
+  const handleCloseAboutPopup = () => {
+    setIsAboutPopupOpen(false);
+  };
+
+  const handleOpenTermsPopup = () => {
+    setIsTermsPopupOpen(true);
+  };
+
+  const handleCloseTermsPopup = () => {
+    setIsTermsPopupOpen(false);
+  };
+
+  const handleOpenPrivacyPopup = () => {
+    setIsPrivacyPopupOpen(true);
+  };
+
+  const handleClosePrivacyPopup = () => {
+    setIsPrivacyPopupOpen(false);
+  };
+
   return (
     <main>
-      <Navbar />
+      <Navbar
+        onAboutClick={handleOpenAboutPopup}
+        onContactClick={handleOpenContactPopup}
+      />
       <Hero />
       <RoleCards />
       <Testimonials />
       <Newsletter />
-      <Footer />
+      <Footer
+        onContactClick={handleOpenContactPopup}
+        onAboutClick={handleOpenAboutPopup}
+        onTermsClick={handleOpenTermsPopup}
+        onPrivacyClick={handleOpenPrivacyPopup}
+      />
+
+      {/* All Popups */}
+      <ContactUsPopup
+        isOpen={isContactPopupOpen}
+        onClose={handleCloseContactPopup}
+      />
+      <InfoPopup
+        isOpen={isAboutPopupOpen}
+        onClose={handleCloseAboutPopup}
+        title="About Us"
+        content={aboutUsContent}
+      />
+      <InfoPopup
+        isOpen={isTermsPopupOpen}
+        onClose={handleCloseTermsPopup}
+        title="Terms of Service"
+        content={termsOfServiceContent}
+      />
+      <InfoPopup
+        isOpen={isPrivacyPopupOpen}
+        onClose={handleClosePrivacyPopup}
+        title="Privacy Policy"
+        content={privacyPolicyContent}
+      />
     </main>
   )
 }

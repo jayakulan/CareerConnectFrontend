@@ -1,21 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2, Building2 } from 'lucide-react';
 import './Jobs.css';
 
 const Jobs = () => {
-  const [jobs, setJobs] = useState([
-    { id: 1, title: 'Senior Frontend Developer', company: 'TechCorp', type: 'Full-time', location: 'Remote', salary: '$120k - $150k', status: 'Active', posted: '2 days ago' },
-    { id: 2, title: 'Backend Engineer', company: 'StartupHub', type: 'Contract', location: 'New York, NY', salary: '$80/hr', status: 'Active', posted: '5 days ago' },
-    { id: 3, title: 'Product Designer', company: 'DesignStudio', type: 'Full-time', location: 'London, UK', salary: '£60k - £80k', status: 'Closed', posted: '1 week ago' },
-    { id: 4, title: 'DevOps Specialist', company: 'CloudSystems', type: 'Full-time', location: 'Austin, TX', salary: '$130k - $160k', status: 'Active', posted: '1 day ago' },
-    { id: 5, title: 'Marketing Manager', company: 'GrowthCo', type: 'Part-time', location: 'Remote', salary: '$40k - $60k', status: 'Active', posted: '3 days ago' },
-  ]);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/jobs`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch jobs');
+      }
+      const data = await response.json();
+      setJobs(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this job posting?')) {
-      setJobs(jobs.filter(job => job.id !== id));
+      // In a real app, you would call DELETE API here
+      setJobs(jobs.filter(job => job._id !== id));
     }
   };
+
+  const getTimeAgo = (date) => {
+    const now = new Date();
+    const posted = new Date(date);
+    const diffInMs = now - posted;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 0) return 'Today';
+    if (diffInDays === 1) return '1 day ago';
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    return `${Math.floor(diffInDays / 7)} weeks ago`;
+  };
+
+  if (loading) return <div className="loading">Loading jobs...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="jobs-container">
@@ -32,34 +63,40 @@ const Jobs = () => {
 
       <div className="jobs-grid">
         {jobs.map((job) => (
-          <div key={job.id} className="job-card">
+          <div key={job._id} className="job-card">
             <div className="job-header">
               <div className="company-logo">
-                <Building2 size={24} />
+                {job.company?.companyName ? (
+                  <div className="logo-text">{job.company.companyName.charAt(0).toUpperCase()}</div>
+                ) : (
+                  <Building2 size={24} />
+                )}
               </div>
-              <span className={`job-status ${job.status === 'Active' ? 'status-active' : 'status-closed'}`}>
-                {job.status}
+              <span className={`job-status ${job.status === 'published' ? 'status-active' : 'status-closed'}`}>
+                {job.status === 'published' ? 'Active' : job.status}
               </span>
             </div>
 
             <h3 className="job-title">{job.title}</h3>
-            <p className="company-name">{job.company}</p>
+            <p className="company-name">{job.company?.companyName || 'Unknown Company'}</p>
 
             <div className="job-details">
-              <span className="detail-tag">{job.type}</span>
+              <span className="detail-tag">{job.jobType}</span>
               <span className="detail-tag">{job.location}</span>
-              <span className="detail-tag">{job.salary}</span>
+              <span className="detail-tag">
+                {job.salary ? `$${job.salary.min.toLocaleString()} - $${job.salary.max.toLocaleString()}` : 'Salary N/A'}
+              </span>
             </div>
 
             <div className="job-footer">
-              <span className="posted-date">Posted {job.posted}</span>
+              <span className="posted-date">Posted {getTimeAgo(job.createdAt)}</span>
               <div className="job-actions">
                 <button className="btn-icon btn-edit" title="Edit">
                   <Edit size={16} />
                 </button>
                 <button
                   className="btn-icon btn-delete"
-                  onClick={() => handleDelete(job.id)}
+                  onClick={() => handleDelete(job._id)}
                   title="Delete"
                 >
                   <Trash2 size={16} />
@@ -69,8 +106,6 @@ const Jobs = () => {
           </div>
         ))}
       </div>
-
-
     </div>
   );
 };

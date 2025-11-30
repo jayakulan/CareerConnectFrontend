@@ -1,21 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import './Users.css';
 
 const Users = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'seeker', status: 'Active', joinDate: '2023-11-01' },
-    { id: 2, name: 'TechCorp Inc.', email: 'contact@techcorp.com', role: 'company', status: 'Active', joinDate: '2023-10-15' },
-    { id: 3, name: 'Jane Smith', email: 'jane@example.com', role: 'seeker', status: 'Inactive', joinDate: '2023-11-05' },
-    { id: 4, name: 'Admin User', email: 'admin@careerconnect.com', role: 'admin', status: 'Active', joinDate: '2023-09-01' },
-    { id: 5, name: 'StartupHub', email: 'hello@startuphub.io', role: 'company', status: 'Pending', joinDate: '2023-11-20' },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const token = userInfo?.token;
+
+      if (!token) {
+        throw new Error('Not authorized');
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const data = await response.json();
+      setUsers(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(user => user.id !== id));
+      // In a real app, you would call DELETE API here
+      setUsers(users.filter(user => user._id !== id));
     }
   };
+
+  if (loading) return <div className="loading">Loading users...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="users-container">
@@ -37,11 +69,11 @@ const Users = () => {
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.id}>
+              <tr key={user._id}>
                 <td>
                   <div className="user-cell">
                     <div className="user-avatar">
-                      {user.name.charAt(0)}
+                      {user.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="user-info">
                       <h4 className="user-name">{user.name}</h4>
@@ -55,11 +87,11 @@ const Users = () => {
                   </span>
                 </td>
                 <td>
-                  <span className={`status-badge status-${user.status.toLowerCase()}`}>
-                    {user.status}
+                  <span className={`status-badge status-active`}>
+                    Active
                   </span>
                 </td>
-                <td>{user.joinDate}</td>
+                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                 <td>
                   <div className="action-menu">
                     <button className="btn-icon btn-edit" title="Edit">
@@ -67,7 +99,7 @@ const Users = () => {
                     </button>
                     <button
                       className="btn-icon btn-delete"
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => handleDelete(user._id)}
                       title="Delete"
                     >
                       <Trash2 size={16} />
@@ -79,8 +111,6 @@ const Users = () => {
           </tbody>
         </table>
       </div>
-
-
     </div>
   );
 };

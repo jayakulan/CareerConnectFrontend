@@ -218,3 +218,21 @@
         grid-template-columns: 1fr;
     }
 }
+
+.loading,
+.error {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.error {
+    color: #ef4444;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #6b7280;
+}

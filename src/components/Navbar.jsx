@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./landingpage.css";
 
-function Navbar() {
+function Navbar({ onAboutClick }) {
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -22,9 +22,19 @@ function Navbar() {
           <Link to="/companies" className="navbar-nav-link">
             Companies
           </Link>
-          <Link to="/about" className="navbar-nav-link">
+          <button
+            onClick={onAboutClick}
+            className="navbar-nav-link"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px 0',
+              font: 'inherit'
+            }}
+          >
             About
-          </Link>
+          </button>
         </div>
 
         {/* Auth Buttons */}
