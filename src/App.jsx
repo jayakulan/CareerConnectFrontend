@@ -43,7 +43,7 @@ function App() {
               }
             />
             <Route
-              path="/company"
+              path="/company/*"
               element={
                 <ProtectedRoute allowedRoles={['company']}>
                   <CompanyLayout />
@@ -57,7 +57,7 @@ function App() {
               <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
             <Route
-              path="/admin"
+              path="/admin/*"
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminLayout />

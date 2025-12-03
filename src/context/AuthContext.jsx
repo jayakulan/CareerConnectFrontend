@@ -9,19 +9,48 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Check if user is logged in
         const userInfo = localStorage.getItem('userInfo');
-        if (userInfo) {
-            setUser(JSON.parse(userInfo));
+        const token = localStorage.getItem('token');
+
+        if (userInfo && token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+
+                const decoded = JSON.parse(jsonPayload);
+                const isExpired = decoded.exp * 1000 < Date.now();
+
+                if (isExpired) {
+                    localStorage.removeItem('userInfo');
+                    localStorage.removeItem('token');
+                    setUser(null);
+                } else {
+                    setUser(JSON.parse(userInfo));
+                }
+            } catch (error) {
+                console.error("Invalid token:", error);
+                localStorage.removeItem('userInfo');
+                localStorage.removeItem('token');
+                setUser(null);
+            }
         }
         setLoading(false);
     }, []);
 
     const login = (userData) => {
         localStorage.setItem('userInfo', JSON.stringify(userData));
+        // Store token separately for API calls
+        if (userData.token) {
+            localStorage.setItem('token', userData.token);
+        }
         setUser(userData);
     };
 
     const logout = () => {
         localStorage.removeItem('userInfo');
+        localStorage.removeItem('token');
         setUser(null);
     };
 

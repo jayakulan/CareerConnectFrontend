@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Briefcase, DollarSign, Clock, Bookmark, BookmarkCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, MapPin, Briefcase, DollarSign, Clock, Bookmark, BookmarkCheck, X, Upload, FileText, CheckCircle } from 'lucide-react';
 import './Jobs.css';
 
 const Jobs = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
@@ -11,10 +13,42 @@ const Jobs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Application modal states
+  const [showModal, setShowModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [applying, setApplying] = useState(false);
+  const [applicationError, setApplicationError] = useState('');
+  const [applicationSuccess, setApplicationSuccess] = useState(false);
+  const [appliedJobIds, setAppliedJobIds] = useState(new Set());
+
   // Fetch jobs from backend
   useEffect(() => {
     fetchJobs();
+    fetchAppliedJobs();
   }, []);
+
+  const fetchAppliedJobs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return; // User not logged in
+
+      const response = await fetch('http://localhost:5000/api/applications/seeker', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const applications = await response.json();
+        const jobIds = new Set(applications.map(app => app.job._id));
+        setAppliedJobIds(jobIds);
+      }
+    } catch (error) {
+      console.error('Error fetching applied jobs:', error);
+    }
+  };
 
   const fetchJobs = async (keyword = '') => {
     try {
@@ -67,8 +101,11 @@ const Jobs = () => {
     return `${Math.floor(diffInDays / 30)} month${Math.floor(diffInDays / 30) > 1 ? 's' : ''} ago`;
   };
 
-  // Filter jobs based on search criteria
+  // Filter jobs based on search criteria and exclude applied jobs
   const filteredJobs = jobs.filter(job => {
+    // Exclude already applied jobs
+    if (appliedJobIds.has(job._id)) return false;
+
     const matchesSearch = searchTerm === '' ||
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (job.company?.companyName && job.company.companyName.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -80,6 +117,96 @@ const Jobs = () => {
 
     return matchesSearch && matchesLocation && matchesJobType;
   });
+
+  // Application modal handlers
+  const openApplicationModal = (job) => {
+    setSelectedJob(job);
+    setShowModal(true);
+    setResumeFile(null);
+    setCoverLetter('');
+    setApplicationError('');
+    setApplicationSuccess(false);
+  };
+
+  const closeApplicationModal = () => {
+    setShowModal(false);
+    setSelectedJob(null);
+    setResumeFile(null);
+    setCoverLetter('');
+    setApplicationError('');
+    setApplicationSuccess(false);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        setApplicationError('Please upload a PDF, DOC, or DOCX file');
+        return;
+      }
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setApplicationError('File size must be less than 5MB');
+        return;
+      }
+      setResumeFile(file);
+      setApplicationError('');
+    }
+  };
+
+  const handleSubmitApplication = async (e) => {
+    e.preventDefault();
+
+    if (!resumeFile) {
+      setApplicationError('Please upload your resume');
+      return;
+    }
+
+    setApplying(true);
+    setApplicationError('');
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setApplicationError('Please login to apply for jobs');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('resume', resumeFile);
+      formData.append('coverLetter', coverLetter);
+
+      const response = await fetch(`http://localhost:5000/api/applications/apply/${selectedJob._id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to submit application');
+      }
+
+      setApplicationSuccess(true);
+
+      // Add the job to applied jobs list
+      setAppliedJobIds(prev => new Set([...prev, selectedJob._id]));
+
+      setTimeout(() => {
+        closeApplicationModal();
+      }, 2000);
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      setApplicationError(error.message || 'Failed to submit application. Please try again.');
+    } finally {
+      setApplying(false);
+    }
+  };
 
   return (
     <div className="jobs-page">
@@ -235,12 +362,110 @@ const Jobs = () => {
                 )}
 
                 <div className="job-actions">
-                  <button className="btn-apply">Apply Now</button>
-                  <button className="btn-details">View Details</button>
+                  <button className="btn-apply" onClick={() => openApplicationModal(job)}>Apply Now</button>
+                  <button className="btn-details" onClick={() => navigate(`/seeker/jobs/${job._id}`)}>View Details</button>
                 </div>
               </div>
             ))
           )}
+        </div>
+      )}
+
+      {/* Application Modal */}
+      {showModal && selectedJob && (
+        <div className="modal-overlay" onClick={closeApplicationModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Apply for Job</h2>
+              <button className="modal-close" onClick={closeApplicationModal}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="modal-job-info">
+              <h3 className="modal-job-title">{selectedJob.title}</h3>
+              <p className="modal-job-company">{selectedJob.company?.companyName || 'Company Name'}</p>
+            </div>
+
+            {applicationSuccess && (
+              <div className="success-message">
+                <CheckCircle size={18} style={{ display: 'inline', marginRight: '8px' }} />
+                Application submitted successfully!
+              </div>
+            )}
+
+            {applicationError && (
+              <div className="error-message">
+                {applicationError}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitApplication}>
+              <div className="form-group">
+                <label className="form-label">
+                  Resume <span className="required">*</span>
+                </label>
+                <div
+                  className={`file-upload-area ${resumeFile ? 'has-file' : ''}`}
+                  onClick={() => document.getElementById('resume-upload').click()}
+                >
+                  <input
+                    id="resume-upload"
+                    type="file"
+                    className="file-input"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileChange}
+                  />
+                  {resumeFile ? (
+                    <>
+                      <FileText className="upload-icon" size={32} />
+                      <p className="file-name">
+                        <CheckCircle size={16} />
+                        {resumeFile.name}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="upload-icon" size={32} />
+                      <p className="upload-text">Click to upload your resume</p>
+                      <p className="upload-hint">PDF, DOC, or DOCX (Max 5MB)</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">
+                  Cover Letter (Optional)
+                </label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Tell us why you're a great fit for this role..."
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
+                  rows={5}
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={closeApplicationModal}
+                  disabled={applying}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  disabled={applying || !resumeFile}
+                >
+                  {applying ? 'Submitting...' : 'Submit Application'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

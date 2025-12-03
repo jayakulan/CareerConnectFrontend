@@ -1,18 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Briefcase, Users, Sparkles, LogOut } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, Sparkles, LogOut, Edit } from 'lucide-react';
 import Dashboard from '../pages/company/Dashboard';
 import PostJob from '../pages/company/PostJob';
 import Applicants from '../pages/company/Applicants';
 import AIAnalyzeCandidates from '../pages/company/AIAnalyzeCandidates';
+import NotificationDropdown from '../components/NotificationDropdown';
+import EditCompanyProfileModal from '../components/EditCompanyProfileModal';
 
 const CompanyLayout = () => {
   const location = useLocation();
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+  const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem('userInfo') || '{}'));
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/users/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfileData(data);
+        // Update local storage if name changed
+        if (data.name !== userInfo.name) {
+          const newUserInfo = { ...userInfo, name: data.name };
+          localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+          setUserInfo(newUserInfo);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('token');
     window.location.href = '/';
+  };
+
+  const handleProfileUpdate = (updatedData) => {
+    setProfileData(updatedData);
+    // Update local storage if name changed
+    if (updatedData.name && updatedData.name !== userInfo.name) {
+      const newUserInfo = { ...userInfo, name: updatedData.name };
+      localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+      setUserInfo(newUserInfo);
+    }
   };
 
   const navItems = [
@@ -65,13 +110,20 @@ const CompanyLayout = () => {
             <h2 className="header-title">Company Portal</h2>
           </div>
           <div className="header-right">
-            <div className="user-menu">
+            <NotificationDropdown />
+            <div
+              className="user-menu clickable"
+              onClick={() => setIsEditProfileOpen(true)}
+              title="Click to edit profile"
+            >
               <div className="user-avatar">
                 {userInfo.name?.charAt(0) || 'CO'}
               </div>
               <div className="user-info">
                 <span className="user-name">{userInfo.name || 'Company'}</span>
-                <span className="user-role">Employer</span>
+                <span className="user-role">
+                  Employer <Edit size={12} style={{ marginLeft: '4px', display: 'inline' }} />
+                </span>
               </div>
             </div>
           </div>
@@ -87,6 +139,13 @@ const CompanyLayout = () => {
           </Routes>
         </main>
       </div>
+
+      <EditCompanyProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        onUpdate={handleProfileUpdate}
+        initialData={profileData || userInfo}
+      />
 
       <style jsx>{`
         .company-layout {
@@ -105,6 +164,7 @@ const CompanyLayout = () => {
           left: 0;
           top: 0;
           box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+          z-index: 50;
         }
 
         .sidebar-header {
@@ -210,7 +270,7 @@ const CompanyLayout = () => {
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
           position: sticky;
           top: 0;
-          z-index: 10;
+          z-index: 40;
         }
 
         .header-title {
@@ -221,6 +281,12 @@ const CompanyLayout = () => {
           -webkit-text-fill-color: transparent;
         }
 
+        .header-right {
+           display: flex;
+           align-items: center;
+           gap: 20px;
+        }
+
         .user-menu {
           display: flex;
           align-items: center;
@@ -229,6 +295,13 @@ const CompanyLayout = () => {
           background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
           border-radius: 12px;
           border: 2px solid rgba(168, 85, 247, 0.2);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .user-menu:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+            transform: translateY(-1px);
         }
 
         .user-avatar {
@@ -258,6 +331,8 @@ const CompanyLayout = () => {
         .user-role {
           font-size: 12px;
           color: #6b7280;
+          display: flex;
+          align-items: center;
         }
 
         .page-content {

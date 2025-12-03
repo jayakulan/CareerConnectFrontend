@@ -1,148 +1,304 @@
-import React, { useState } from 'react';
-import { Upload, Loader } from 'lucide-react';
+import { useState } from 'react';
+import axios from 'axios';
+import { Upload, FileText, Sparkles, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import './AIAnalyzeCandidates.css';
 
 const AIAnalyzeCandidates = () => {
+  const [resumeText, setResumeText] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [results, setResults] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type === 'application/pdf') {
+        setSelectedFile(file);
+      } else {
+        alert('Please upload a PDF file.');
+      }
+    }
+  };
 
   const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
   };
 
-  const handleAnalyze = () => {
-    setIsAnalyzing(true);
+  const handleAnalyze = async () => {
+    if ((!resumeText && !selectedFile) || !jobDescription) {
+      alert('Please provide a candidate resume (upload or text) and job description');
+      return;
+    }
 
-    setTimeout(() => {
-      setResults([
-        {
-          id: 1,
-          name: 'Sarah Johnson',
-          score: 95,
-          analysis: 'Excellent match with strong technical skills in React, Node.js, and MongoDB. 5+ years of relevant experience in full-stack development. Leadership experience and proven track record of delivering complex projects.',
-          matchedSkills: ['React', 'Node.js', 'MongoDB', 'JavaScript', 'TypeScript'],
-          missingSkills: ['GraphQL']
-        },
-        {
-          id: 2,
-          name: 'Michael Chen',
-          score: 78,
-          analysis: 'Good candidate with solid backend experience. Strong knowledge of Node.js and database systems. Some frontend experience but could benefit from more React expertise.',
-          matchedSkills: ['Node.js', 'MongoDB', 'JavaScript'],
-          missingSkills: ['React', 'TypeScript', 'GraphQL']
-        },
-        {
-          id: 3,
-          name: 'Emily Davis',
-          score: 62,
-          analysis: 'Moderate match. Has foundational skills but lacks experience with the full tech stack. Would require training in several key areas.',
-          matchedSkills: ['JavaScript', 'React'],
-          missingSkills: ['Node.js', 'MongoDB', 'TypeScript', 'GraphQL']
-        }
-      ]);
-      setIsAnalyzing(false);
-    }, 3000);
+    setAnalyzing(true);
+    setAnalysis(null);
+
+    const formData = new FormData();
+    if (selectedFile) formData.append('resumeFile', selectedFile);
+    if (resumeText) formData.append('resumeText', resumeText);
+    formData.append('jobDescription', jobDescription);
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/ai/analyze', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      let analysisData = response.data.analysis;
+
+      if (typeof analysisData === 'string') {
+        const cleanJson = analysisData.replace(/```json|```/g, "");
+        analysisData = JSON.parse(cleanJson);
+      }
+
+      const matchScore = analysisData.match_score || 0;
+      const derivedRecommendation = matchScore >= 80 ? 'Hire' : matchScore >= 60 ? 'Interview' : 'Reject';
+
+      setAnalysis({
+        matchPercentage: matchScore,
+        recommendation: derivedRecommendation,
+        summary: analysisData.verdict || "Analysis complete.",
+        strengths: analysisData.strengths || [],
+        weaknesses: analysisData.weaknesses || [],
+        missingSkills: analysisData.missing_keywords || []
+      });
+    } catch (error) {
+      console.error('Error analyzing resume:', error.response?.data || error.message);
+      alert(`Error: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
-  const getScoreClass = (score) => {
-    if (score >= 80) return 'score-high';
-    if (score >= 60) return 'score-medium';
-    return 'score-low';
+  const getMatchColor = (percentage) => {
+    if (percentage >= 80) return '#10b981';
+    if (percentage >= 60) return '#f59e0b';
+    return '#ef4444';
+  };
+
+  const getRecommendationIcon = (recommendation) => {
+    switch (recommendation) {
+      case 'Hire':
+        return <CheckCircle size={24} style={{ color: '#10b981' }} />;
+      case 'Interview':
+        return <AlertCircle size={24} style={{ color: '#f59e0b' }} />;
+      case 'Reject':
+        return <XCircle size={24} style={{ color: '#ef4444' }} />;
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className="ai-analyze-container">
-      <div className="ai-header">
-        <h1 className="ai-title">🤖 AI-Powered Candidate Analysis</h1>
-        <p className="ai-subtitle">Upload resumes and let AI find the best matches for your job posting</p>
+    <div className="ai-resume-page">
+      <div className="page-header">
+        <div className="header-content">
+          <Sparkles size={32} className="header-icon" />
+          <div>
+            <h1 className="page-title">AI Candidate Analyzer</h1>
+            <p className="page-subtitle">Analyze candidate resumes against your job requirements with AI</p>
+          </div>
+        </div>
       </div>
 
-      <div className="upload-section">
-        <div className="upload-area" onClick={() => document.getElementById('fileInput').click()}>
-          <Upload size={48} className="upload-icon" />
-          <p className="upload-text">
-            {selectedFile ? selectedFile.name : 'Click to upload resumes'}
-          </p>
-          <p className="upload-hint">Supports PDF, DOC, DOCX (Max 10MB)</p>
-          <input
-            id="fileInput"
-            type="file"
-            multiple
-            accept=".pdf,.doc,.docx"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
-        </div>
+      <div className="analyzer-container">
+        {/* Upload Section */}
+        <div className="upload-section">
+          <div className="upload-card">
+            <h2 className="section-title">Candidate Resume</h2>
 
-        <button
-          className="analyze-btn"
-          onClick={handleAnalyze}
-          disabled={!selectedFile || isAnalyzing}
-        >
-          {isAnalyzing ? 'Analyzing...' : 'Analyze Candidates with AI'}
-        </button>
-      </div>
+            {/* File Upload UI */}
+            <div
+              className={`file-upload-area ${isDragging ? 'dragging' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <input
+                type="file"
+                id="resume-upload"
+                className="file-input"
+                accept=".pdf"
+                onChange={handleFileChange}
+              />
+              <label htmlFor="resume-upload" className="file-upload-label">
+                <Upload size={48} className="upload-icon" />
+                <div className="upload-text">
+                  <p className="upload-main-text">
+                    {selectedFile ? selectedFile.name : "Click to upload or drag and drop"}
+                  </p>
+                  <p className="upload-sub-text">PDF (Max 5MB)</p>
+                </div>
+              </label>
+            </div>
 
-      {isAnalyzing && (
-        <div className="loading-spinner">
-          <Loader size={48} className="spinner" />
-          <p className="loading-text">AI is analyzing candidates...</p>
-        </div>
-      )}
+            <div style={{ textAlign: 'center', margin: '10px 0', color: '#6b7280' }}>OR</div>
 
-      {results && !isAnalyzing && (
-        <div className="results-section">
-          <div className="results-header">
-            <h2 className="results-title">Analysis Results</h2>
-            <span className="results-count">{results.length} candidates analyzed</span>
+            <textarea
+              className="job-desc-textarea"
+              rows="6"
+              placeholder="Paste candidate resume text here..."
+              value={resumeText}
+              onChange={(e) => {
+                setResumeText(e.target.value);
+                setSelectedFile(null);
+              }}
+            />
           </div>
 
-          {results.map((candidate) => (
-            <div key={candidate.id} className="candidate-result">
-              <div className="candidate-header">
-                <h3 className="candidate-name">{candidate.name}</h3>
-                <span className={`match-score ${getScoreClass(candidate.score)}`}>
-                  {candidate.score}% Match
-                </span>
-              </div>
+          <div className="job-desc-card">
+            <h2 className="section-title">Job Requirements</h2>
+            <textarea
+              className="job-desc-textarea"
+              rows="10"
+              placeholder="Paste your job description and requirements here..."
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+            />
+          </div>
 
-              <p className="analysis-text">{candidate.analysis}</p>
+          <button
+            className="analyze-btn"
+            onClick={handleAnalyze}
+            disabled={analyzing || (!resumeText && !selectedFile) || !jobDescription}
+          >
+            {analyzing ? (
+              <>
+                <div className="spinner"></div>
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Sparkles size={20} />
+                Analyze with AI
+              </>
+            )}
+          </button>
+        </div>
 
-              <div className="skills-section">
-                <p className="skills-label">Matched Skills:</p>
-                <div className="skills-match">
-                  {candidate.matchedSkills.map((skill, index) => (
-                    <span key={index} className="skill-tag skill-matched">
-                      ✓ {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
+        {/* Results Section */}
+        {analysis && (
+          <div className="results-section">
+            <div className="results-header">
+              <h2 className="results-title">Analysis Results</h2>
+            </div>
 
-              {candidate.missingSkills.length > 0 && (
-                <div className="skills-section">
-                  <p className="skills-label">Missing Skills:</p>
-                  <div className="skills-match">
-                    {candidate.missingSkills.map((skill, index) => (
-                      <span key={index} className="skill-tag skill-missing">
-                        ✕ {skill}
-                      </span>
-                    ))}
+            {/* Match Score */}
+            <div className="match-card">
+              <div className="match-score-container">
+                <div className="match-circle-wrapper">
+                  <svg className="match-circle-svg" viewBox="0 0 200 200">
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r="90"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="12"
+                    />
+                    <circle
+                      cx="100"
+                      cy="100"
+                      r="90"
+                      fill="none"
+                      stroke={getMatchColor(analysis.matchPercentage)}
+                      strokeWidth="12"
+                      strokeDasharray={`${analysis.matchPercentage * 5.65} 565`}
+                      strokeLinecap="round"
+                      transform="rotate(-90 100 100)"
+                      className="match-circle-progress"
+                    />
+                  </svg>
+                  <div className="match-percentage">
+                    <span className="match-number">{analysis.matchPercentage}%</span>
+                    <span className="match-label">Match</span>
                   </div>
                 </div>
-              )}
-
-              <div className="candidate-actions">
-                <button className="action-btn btn-view">View Full Profile</button>
-                <button className="action-btn btn-interview">Schedule Interview</button>
+                <div className="recommendation-box">
+                  {getRecommendationIcon(analysis.recommendation)}
+                  <div>
+                    <p className="recommendation-label">Recommendation</p>
+                    <p className="recommendation-value">{analysis.recommendation}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
 
+            {/* Summary */}
+            <div className="summary-card">
+              <h3 className="card-title">Summary</h3>
+              <p className="summary-text">{analysis.summary}</p>
+            </div>
 
+            {/* Strengths & Weaknesses */}
+            <div className="insights-grid">
+              <div className="insights-card strengths-card">
+                <h3 className="card-title">
+                  <CheckCircle size={20} style={{ color: '#10b981' }} />
+                  Strengths
+                </h3>
+                <ul className="insights-list">
+                  {analysis.strengths.map((strength, index) => (
+                    <li key={index} className="insight-item strength-item">
+                      <span className="insight-bullet">✓</span>
+                      {strength}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="insights-card weaknesses-card">
+                <h3 className="card-title">
+                  <AlertCircle size={20} style={{ color: '#f59e0b' }} />
+                  Areas for Improvement
+                </h3>
+                <ul className="insights-list">
+                  {analysis.weaknesses.map((weakness, index) => (
+                    <li key={index} className="insight-item weakness-item">
+                      <span className="insight-bullet">!</span>
+                      {weakness}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Missing Skills */}
+            <div className="missing-skills-card">
+              <h3 className="card-title">
+                <FileText size={20} />
+                Missing Skills
+              </h3>
+              <div className="skills-tags">
+                {analysis.missingSkills.map((skill, index) => (
+                  <span key={index} className="skill-tag missing">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+              <p className="skills-tip">
+                💡 These skills are required but not found in the candidate's resume
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

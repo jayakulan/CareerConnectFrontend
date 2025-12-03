@@ -3,8 +3,10 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Briefcase, User, FileText, LogOut, Sparkles } from 'lucide-react';
 import Dashboard from '../pages/seeker/Dashboard';
 import Jobs from '../pages/seeker/Jobs';
+import JobDetails from '../pages/seeker/JobDetails';
 import Profile from '../pages/seeker/Profile';
 import AIResumeCheck from '../pages/seeker/AIResumeCheck';
+import NotificationDropdown from '../components/NotificationDropdown';
 
 const SeekerLayout = () => {
   const location = useLocation();
@@ -12,6 +14,7 @@ const SeekerLayout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('token');
     window.location.href = '/';
   };
 
@@ -36,7 +39,7 @@ const SeekerLayout = () => {
         <nav className="sidebar-nav">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = location.pathname === item.path || (item.path === '/seeker/jobs' && location.pathname.includes('/seeker/jobs/'));
             return (
               <Link
                 key={item.path}
@@ -65,6 +68,7 @@ const SeekerLayout = () => {
             <h2 className="header-title">Job Seeker Portal</h2>
           </div>
           <div className="header-right">
+            <NotificationDropdown />
             <div className="user-menu">
               <div className="user-avatar">
                 {userInfo.name?.charAt(0) || 'JS'}
@@ -81,6 +85,7 @@ const SeekerLayout = () => {
           <Routes>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="jobs" element={<Jobs />} />
+            <Route path="jobs/:id" element={<JobDetails />} />
             <Route path="profile" element={<Profile />} />
             <Route path="ai-resume" element={<AIResumeCheck />} />
           </Routes>
@@ -104,6 +109,7 @@ const SeekerLayout = () => {
           left: 0;
           top: 0;
           box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+          z-index: 50;
         }
 
         .sidebar-header {
@@ -209,7 +215,7 @@ const SeekerLayout = () => {
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
           position: sticky;
           top: 0;
-          z-index: 10;
+          z-index: 40;
         }
 
         .header-title {
@@ -218,6 +224,12 @@ const SeekerLayout = () => {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+           display: flex;
+           align-items: center;
+           gap: 20px;
         }
 
         .user-menu {
