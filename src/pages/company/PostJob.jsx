@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { X, Edit } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import './PostJob.css';
@@ -209,6 +209,10 @@ const PostJob = () => {
                 <div className="job-status">
                   <span className="status-badge">{job.status || 'Active'}</span>
                   <span className="job-date">{new Date(job.createdAt).toLocaleDateString()}</span>
+                  <Link to={`/company/edit-job/${job._id}`} className="edit-job-btn">
+                    <Edit size={16} />
+                    Edit
+                  </Link>
                 </div>
               </div>
             ))

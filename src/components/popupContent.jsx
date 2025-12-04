@@ -220,3 +220,79 @@ export const privacyPolicyContent = (
         </p>
     </>
 );
+
+export const companiesContent = (
+    <>
+        <h3>Partner with Leading Companies</h3>
+        <p>
+            CareerConnect connects you with top-tier companies across various industries. Our platform features
+            verified employers ranging from innovative startups to Fortune 500 companies, all looking for talented
+            professionals like you.
+        </p>
+
+        <h3>Featured Company Benefits</h3>
+        <ul>
+            <li><strong>Verified Employers:</strong> All companies on our platform undergo a thorough verification process to ensure legitimacy and quality.</li>
+            <li><strong>Diverse Industries:</strong> Explore opportunities in technology, healthcare, finance, education, marketing, and more.</li>
+            <li><strong>Company Insights:</strong> Access detailed company profiles, culture information, employee reviews, and growth opportunities.</li>
+            <li><strong>Direct Communication:</strong> Connect directly with hiring managers and HR teams for faster response times.</li>
+            <li><strong>Transparent Process:</strong> Clear job descriptions, salary ranges, and application status tracking.</li>
+        </ul>
+
+        <h3>Why Companies Choose CareerConnect</h3>
+        <p>
+            <strong>Access to Top Talent:</strong> Companies use CareerConnect to find qualified candidates efficiently.<br />
+            <strong>Streamlined Hiring:</strong> Advanced filtering and matching algorithms save time and resources.<br />
+            <strong>Brand Visibility:</strong> Showcase company culture and values to attract the right candidates.<br />
+            <strong>Analytics & Insights:</strong> Data-driven tools help companies make informed hiring decisions.
+        </p>
+
+        <h3>Start Your Journey</h3>
+        <p>
+            Browse through hundreds of verified companies actively hiring. Whether you're looking for a startup
+            environment or an established corporation, CareerConnect has the perfect match for your career goals.
+        </p>
+    </>
+);
+
+export const careersContent = (
+    <>
+        <h3>Your Career Journey Starts Here</h3>
+        <p>
+            At CareerConnect, we're committed to helping you build a successful and fulfilling career. Whether you're
+            just starting out, looking to make a career change, or seeking advancement in your current field, we provide
+            the tools and resources you need to succeed.
+        </p>
+
+        <h3>Career Resources</h3>
+        <ul>
+            <li><strong>AI Resume Analysis:</strong> Get instant feedback on your resume with our advanced AI-powered tool that provides personalized recommendations.</li>
+            <li><strong>Job Matching:</strong> Our intelligent algorithms match you with positions that align with your skills, experience, and career goals.</li>
+            <li><strong>Career Guidance:</strong> Access expert advice, industry insights, and career development tips to accelerate your professional growth.</li>
+            <li><strong>Skill Development:</strong> Discover learning opportunities and certifications to enhance your qualifications.</li>
+            <li><strong>Interview Preparation:</strong> Get tips and resources to ace your interviews and land your dream job.</li>
+        </ul>
+
+        <h3>Career Paths We Support</h3>
+        <p>
+            <strong>Technology:</strong> Software Development, Data Science, Cybersecurity, Cloud Computing, AI/ML<br />
+            <strong>Business:</strong> Marketing, Sales, Finance, Operations, Project Management<br />
+            <strong>Creative:</strong> Design, Content Creation, Digital Marketing, UX/UI<br />
+            <strong>Healthcare:</strong> Medical, Nursing, Healthcare Administration, Research<br />
+            <strong>And Many More:</strong> Education, Engineering, Legal, Hospitality, and more
+        </p>
+
+        <h3>Success Stories</h3>
+        <p>
+            Thousands of professionals have successfully advanced their careers through CareerConnect. Our platform
+            has helped people transition to new industries, secure promotions, and find roles that align with their
+            passions and values.
+        </p>
+
+        <h3>Take the Next Step</h3>
+        <p>
+            Ready to take control of your career? Create your profile, upload your resume, and start exploring
+            opportunities tailored to your unique skills and aspirations. Your dream job is just a click away!
+        </p>
+    </>
+);

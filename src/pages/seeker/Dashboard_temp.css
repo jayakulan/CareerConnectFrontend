@@ -306,12 +306,20 @@
         padding: 24px;
     }
 
-    100% {
-        background-position: 200% 0;
+    @keyframes slideBg {
+        0% {
+            background-position: 0% 0;
+        }
+
+        100% {
+            background-position: 200% 0;
+        }
     }
+
 }
 
 .section-title {
     font-size: 24px;
     font-weight: 800;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}

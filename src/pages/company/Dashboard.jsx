@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Users, Calendar, Eye, TrendingUp } from 'lucide-react';
+import { Briefcase, Users, Calendar, Eye, TrendingUp, Edit, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import './Dashboard.css';
 
@@ -14,52 +14,75 @@ const Dashboard = () => {
   const [recentApplicants, setRecentApplicants] = useState([]);
   const [myJobs, setMyJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          console.error('No token found');
+          setLoading(false);
+          return;
+        }
+
         const config = {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         };
 
-        // Use the correct API URL without double /api if VITE_API_URL has it
-        // Assuming VITE_API_URL includes /api based on previous checks
+        // Fetch jobs data
         const { data: jobs } = await axios.get(`${import.meta.env.VITE_API_URL}/jobs/myjobs`, config);
         setMyJobs(jobs);
 
         const activeJobsCount = jobs.filter(job => job.status === 'published').length;
 
-        let totalApplicants = 0;
-        let allApplicants = [];
-
-        jobs.forEach(job => {
-          totalApplicants += job.applications.length;
-          job.applications.forEach(app => {
-            allApplicants.push({
-              id: app._id,
-              name: app.user ? app.user.name : 'Unknown Candidate',
-              role: job.title,
-              date: new Date(app.appliedAt).toLocaleDateString(),
-              status: app.status,
-              jobId: job._id
-            });
-          });
+        // Fetch applications using the same endpoint as Applicants page
+        const applicationsResponse = await fetch('http://localhost:5000/api/applications/company', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
 
-        // Sort applicants by date (newest first)
-        allApplicants.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let allApplicants = [];
+        let totalApplicants = 0;
+        let interviewCount = 0;
+
+        if (applicationsResponse.ok) {
+          const applications = await applicationsResponse.json();
+          totalApplicants = applications.length;
+
+          // Count interviews (accepted or interview status)
+          interviewCount = applications.filter(app =>
+            app.status === 'interview' || app.status === 'accepted'
+          ).length;
+
+          // Map applications to recent applicants format
+          allApplicants = applications.map(app => ({
+            id: app._id,
+            name: app.seeker?.name || 'Unknown Candidate',
+            role: app.job?.title || 'Unknown Position',
+            date: new Date(app.appliedAt).toLocaleDateString(),
+            status: app.status,
+            jobId: app.job?._id
+          }));
+
+          // Sort by date (newest first)
+          allApplicants.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
 
         setStats([
           { title: 'Active Jobs', value: activeJobsCount, icon: Briefcase, trend: 'Updated just now', color: 'blue' },
           { title: 'Total Applicants', value: totalApplicants, icon: Users, trend: 'Updated just now', color: 'green' },
-          { title: 'Interviews', value: '0', icon: Calendar, trend: 'Coming soon', color: 'purple' },
+          { title: 'Interviews', value: interviewCount, icon: Calendar, trend: 'Updated just now', color: 'purple' },
           { title: 'Views', value: '0', icon: Eye, trend: 'Coming soon', color: 'orange' },
         ]);
 
         setRecentApplicants(allApplicants.slice(0, 5));
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        setError('Failed to load dashboard data. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -67,6 +90,76 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  const handleDeleteJob = async (jobId, hasApplications) => {
+    if (hasApplications) {
+      alert('Cannot delete job with existing applications. Please close the job instead.');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setDeleting(jobId);
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/jobs/${jobId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete job');
+      }
+
+      // Remove job from state
+      setMyJobs(myJobs.filter(job => job._id !== jobId));
+      alert('Job deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      alert(error.message || 'Failed to delete job. Please try again.');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const handleCloseJob = async (jobId) => {
+    if (!window.confirm('Are you sure you want to close this job posting?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/jobs/${jobId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: 'closed' })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to close job');
+      }
+
+      // Update job status in state
+      setMyJobs(myJobs.map(job =>
+        job._id === jobId ? { ...job, status: 'closed' } : job
+      ));
+      alert('Job closed successfully!');
+    } catch (error) {
+      console.error('Error closing job:', error);
+      alert('Failed to close job. Please try again.');
+    }
+  };
 
   if (loading) {
     return <div className="dashboard-container">Loading dashboard...</div>;
@@ -113,6 +206,7 @@ const Dashboard = () => {
                   <th>Applicants</th>
                   <th>Status</th>
                   <th>Posted Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,6 +224,36 @@ const Dashboard = () => {
                       </span>
                     </td>
                     <td>{new Date(job.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <Link
+                          to={`/company/edit-job/${job._id}`}
+                          className="btn-action btn-edit"
+                          title="Edit Job"
+                        >
+                          <Edit size={16} />
+                        </Link>
+                        {job.applications && job.applications.length > 0 ? (
+                          <button
+                            onClick={() => handleCloseJob(job._id)}
+                            className="btn-action btn-close-job"
+                            title="Close Job"
+                            disabled={job.status === 'closed'}
+                          >
+                            {job.status === 'closed' ? 'Closed' : 'Close'}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleDeleteJob(job._id, job.applications?.length > 0)}
+                            className="btn-action btn-delete"
+                            title="Delete Job"
+                            disabled={deleting === job._id}
+                          >
+                            {deleting === job._id ? '...' : <Trash2 size={16} />}
+                          </button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -143,7 +267,7 @@ const Dashboard = () => {
       <div className="section-card">
         <div className="section-header">
           <h2 className="section-title">Recent Applicants</h2>
-          <Link to="/company/applicants" className="view-all-btn">View All Applications →</Link>
+          <Link to="/company/applications" className="view-all-btn">View All Applications →</Link>
         </div>
         <div className="applicants-table-container">
           {recentApplicants.length > 0 ? (

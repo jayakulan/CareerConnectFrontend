@@ -3,6 +3,7 @@ import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, Briefcase, Users, Sparkles, LogOut, Edit } from 'lucide-react';
 import Dashboard from '../pages/company/Dashboard';
 import PostJob from '../pages/company/PostJob';
+import EditJob from '../pages/company/EditJob';
 import Applicants from '../pages/company/Applicants';
 import AIAnalyzeCandidates from '../pages/company/AIAnalyzeCandidates';
 import NotificationDropdown from '../components/NotificationDropdown';
@@ -133,6 +134,7 @@ const CompanyLayout = () => {
           <Routes>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="post-job" element={<PostJob />} />
+            <Route path="edit-job/:id" element={<EditJob />} />
             <Route path="applications" element={<Applicants />} />
             <Route path="ai-analyze" element={<AIAnalyzeCandidates />} />
             <Route index element={<Navigate to="dashboard" replace />} />

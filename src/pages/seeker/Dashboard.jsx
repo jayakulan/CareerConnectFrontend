@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Clock, TrendingUp, CheckCircle } from 'lucide-react';
+import { Briefcase, MapPin, Clock, TrendingUp, CheckCircle, X, Calendar, Trash2 } from 'lucide-react';
 import './Dashboard.css';
 
 const SeekerDashboard = () => {
@@ -10,6 +10,12 @@ const SeekerDashboard = () => {
   });
   const [recentApplications, setRecentApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedInterview, setSelectedInterview] = useState(null);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(null);
+  const [error, setError] = useState(null);
+  const [profileCompletion, setProfileCompletion] = useState(0);
+  const [showProfileAlert, setShowProfileAlert] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
@@ -31,6 +37,42 @@ const SeekerDashboard = () => {
       if (response.ok) {
         const applications = await response.json();
 
+        // Fetch saved jobs
+        const savedResponse = await fetch(`${import.meta.env.VITE_API_URL}/jobs/saved`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        let savedCount = 0;
+        if (savedResponse.ok) {
+          const savedJobs = await savedResponse.json();
+          savedCount = savedJobs.length;
+        }
+
+        // Fetch Profile for completion
+        const profileResponse = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (profileResponse.ok) {
+          const userData = await profileResponse.json();
+          // Calculate completion
+          let score = 0;
+          let total = 6; // Name, Email, Bio, Skills, Experience, Education
+
+          if (userData.name) score++;
+          if (userData.email) score++;
+
+          const profile = userData.profile || {};
+          if (profile.bio) score++;
+          if (profile.skills && profile.skills.length > 0) score++;
+          if (profile.experience && profile.experience.length > 0) score++;
+          if (profile.education && profile.education.length > 0) score++;
+
+          setProfileCompletion(Math.round((score / total) * 100));
+        }
+
         // Calculate stats
         const appliedCount = applications.length;
         const interviewCount = applications.filter(app =>
@@ -39,7 +81,7 @@ const SeekerDashboard = () => {
 
         setStats({
           appliedJobs: appliedCount,
-          savedJobs: 0, // Can be implemented later
+          savedJobs: savedCount,
           interviews: interviewCount,
         });
 
@@ -48,8 +90,81 @@ const SeekerDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleWithdrawApplication = async (applicationId) => {
+    if (!window.confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setWithdrawing(applicationId);
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`http://localhost:5000/api/applications/${applicationId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to withdraw application');
+      }
+
+      // Remove application from state
+      setRecentApplications(recentApplications.filter(app => app._id !== applicationId));
+
+      // Update stats
+      setStats(prev => ({
+        ...prev,
+        appliedJobs: prev.appliedJobs - 1
+      }));
+
+      alert('Application withdrawn successfully!');
+    } catch (error) {
+      console.error('Error withdrawing application:', error);
+      alert(error.message || 'Failed to withdraw application. Please try again.');
+    } finally {
+      setWithdrawing(null);
+    }
+  };
+
+  const handleInterviewResponse = async (status) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/applications/${selectedInterview._id}/interview-response`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+      });
+
+      if (response.ok) {
+        const updatedApp = await response.json();
+
+        // Update local state
+        setRecentApplications(prev => prev.map(app =>
+          app._id === updatedApp._id ? updatedApp : app
+        ));
+
+        // Update selected interview to reflect change
+        setSelectedInterview(updatedApp);
+
+        alert(`Interview ${status} successfully!`);
+      } else {
+        throw new Error('Failed to update interview status');
+      }
+    } catch (error) {
+      console.error('Error responding to interview:', error);
+      alert('Failed to update status. Please try again.');
     }
   };
 
@@ -89,6 +204,27 @@ const SeekerDashboard = () => {
         <h1 className="dashboard-title">Welcome back, Job Seeker!</h1>
         <p className="dashboard-subtitle">Here's what's happening with your job search</p>
       </div>
+
+      {/* Profile Completion Alert */}
+      {showProfileAlert && profileCompletion < 100 && (
+        <div className="profile-alert">
+          <div className="profile-alert-content">
+            <div className="profile-alert-info">
+              <h3>Complete your profile</h3>
+              <p>You are {profileCompletion}% there! Complete your profile to get better job recommendations.</p>
+            </div>
+            <div className="profile-progress-container">
+              <div className="profile-progress-bar">
+                <div className="profile-progress-fill" style={{ width: `${profileCompletion}%` }}></div>
+              </div>
+              <span className="profile-progress-text">{profileCompletion}%</span>
+            </div>
+            <button className="btn-close-alert" onClick={() => setShowProfileAlert(false)}>
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="stats-grid">
@@ -154,24 +290,127 @@ const SeekerDashboard = () => {
                       <Clock size={16} />
                       {formatDate(app.appliedAt)}
                     </span>
-                    {app.matchPercentage !== undefined && (
-                      <span className="meta-item match-percentage">
-                        Match: {app.matchPercentage}%
-                      </span>
-                    )}
                   </div>
                 </div>
                 <div className="application-status">
                   <span className={`status-badge ${getStatusBadgeClass(app.status)}`}>
                     {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                   </span>
+                  {app.status === 'interview' && app.interviewDetails && (
+                    <button
+                      className="view-interview-btn"
+                      onClick={() => {
+                        setSelectedInterview(app);
+                        setShowInterviewModal(true);
+                      }}
+                    >
+                      View Details
+                    </button>
+                  )}
+                  {app.status !== 'accepted' && app.status !== 'rejected' && (
+                    <button
+                      className="withdraw-btn"
+                      onClick={() => handleWithdrawApplication(app._id)}
+                      disabled={withdrawing === app._id}
+                      title="Withdraw Application"
+                    >
+                      {withdrawing === app._id ? 'Withdrawing...' : <Trash2 size={14} />}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-    </div>
+
+
+      {/* Interview Details Modal */}
+      {
+        showInterviewModal && selectedInterview && (
+          <div className="modal-overlay" onClick={() => setShowInterviewModal(false)}>
+            <div className="modal-content interview-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2 className="modal-title">Interview Details</h2>
+                <button className="modal-close" onClick={() => setShowInterviewModal(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="interview-details-content">
+                <div className="interview-company-header">
+                  <h3>{selectedInterview.job?.company?.companyName}</h3>
+                  <p>{selectedInterview.job?.title}</p>
+                </div>
+
+                <div className="interview-info-grid">
+                  <div className="interview-info-item">
+                    <span className="label">Date</span>
+                    <span className="value">
+                      <Calendar size={16} />
+                      {new Date(selectedInterview.interviewDetails.date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="interview-info-item">
+                    <span className="label">Time</span>
+                    <span className="value">
+                      <Clock size={16} />
+                      {selectedInterview.interviewDetails.time}
+                    </span>
+                  </div>
+                  <div className="interview-info-item">
+                    <span className="label">Type</span>
+                    <span className="value capitalize">
+                      {selectedInterview.interviewDetails.type}
+                    </span>
+                  </div>
+                  <div className="interview-info-item full-width">
+                    <span className="label">Location / Link</span>
+                    <span className="value highlight">
+                      {selectedInterview.interviewDetails.location}
+                    </span>
+                  </div>
+                  {selectedInterview.interviewDetails.message && (
+                    <div className="interview-info-item full-width">
+                      <span className="label">Message from Company</span>
+                      <p className="message-box">
+                        {selectedInterview.interviewDetails.message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="modal-actions">
+                  {(!selectedInterview.interviewDetails.status || selectedInterview.interviewDetails.status === 'pending') ? (
+                    <>
+                      <button
+                        className="btn-accept"
+                        onClick={() => handleInterviewResponse('confirmed')}
+                      >
+                        Confirm Attendance
+                      </button>
+                      <button
+                        className="btn-reject-full"
+                        onClick={() => handleInterviewResponse('declined')}
+                      >
+                        Decline
+                      </button>
+                    </>
+                  ) : (
+                    <div className={`interview-status-banner status-${selectedInterview.interviewDetails.status}`}>
+                      Interview {selectedInterview.interviewDetails.status}
+                    </div>
+                  )}
+                  <button className="btn-close" onClick={() => setShowInterviewModal(false)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div >
   );
 };
 

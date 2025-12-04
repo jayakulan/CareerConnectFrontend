@@ -10,7 +10,15 @@ const Applicants = () => {
   const [error, setError] = useState(null);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [interviewDetails, setInterviewDetails] = useState({
+    date: '',
+    time: '',
+    type: 'online',
+    location: '',
+    message: ''
+  });
 
   useEffect(() => {
     fetchApplicants();
@@ -51,18 +59,24 @@ const Applicants = () => {
     }
   };
 
-  const handleStatusUpdate = async (applicationId, newStatus) => {
+  const handleStatusUpdate = async (applicationId, newStatus, details = null) => {
     try {
       setUpdating(true);
 
       const token = localStorage.getItem('token');
+      const body = { status: newStatus };
+
+      if (details) {
+        body.interviewDetails = details;
+      }
+
       const response = await fetch(`http://localhost:5000/api/applications/${applicationId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) {
@@ -72,19 +86,40 @@ const Applicants = () => {
       // Refresh applicants list
       await fetchApplicants();
 
-      // Close modal if open
-      if (showModal) {
-        setShowModal(false);
-        setSelectedApplicant(null);
-      }
+      // Close modals
+      setShowModal(false);
+      setShowInterviewModal(false);
+      setSelectedApplicant(null);
+      setInterviewDetails({
+        date: '',
+        time: '',
+        type: 'online',
+        location: '',
+        message: ''
+      });
 
-      alert(`Application ${newStatus === 'accepted' ? 'accepted' : newStatus === 'rejected' ? 'rejected' : 'updated'} successfully!`);
+      alert(`Application updated successfully!`);
     } catch (error) {
       console.error('Error updating status:', error);
       alert('Failed to update application status');
     } finally {
       setUpdating(false);
     }
+  };
+
+  const openInterviewModal = (applicant) => {
+    setSelectedApplicant(applicant);
+    setShowInterviewModal(true);
+  };
+
+  const handleInterviewSubmit = (e) => {
+    e.preventDefault();
+    if (!selectedApplicant) return;
+
+    // Combine date and time for the date object if needed, or keep separate as per schema
+    // The schema has interviewDetails object with date and time separate
+
+    handleStatusUpdate(selectedApplicant._id, 'interview', interviewDetails);
   };
 
   const viewApplicantDetails = (applicant) => {
@@ -218,12 +253,6 @@ const Applicants = () => {
                     <span className="meta-label">Applied Date</span>
                     <span className="meta-value">{formatDate(applicant.appliedAt)}</span>
                   </div>
-                  {applicant.matchPercentage !== undefined && (
-                    <div className="meta-item">
-                      <span className="meta-label">Match</span>
-                      <span className="meta-value">{applicant.matchPercentage}%</span>
-                    </div>
-                  )}
                   <div className="meta-item">
                     <span className="meta-label">Status</span>
                     <span className={`status-badge ${getStatusBadgeClass(applicant.status)}`}>
@@ -242,14 +271,25 @@ const Applicants = () => {
                   </button>
                   {applicant.status !== 'accepted' && applicant.status !== 'rejected' && (
                     <>
-                      <button
-                        className="btn-icon btn-approve"
-                        title="Accept for Interview"
-                        onClick={() => handleStatusUpdate(applicant._id, 'accepted')}
-                        disabled={updating}
-                      >
-                        <Check size={18} />
-                      </button>
+                      {applicant.status !== 'interview' ? (
+                        <button
+                          className="btn-icon btn-approve"
+                          title="Schedule Interview"
+                          onClick={() => openInterviewModal(applicant)}
+                          disabled={updating}
+                        >
+                          <Check size={18} />
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-icon btn-approve"
+                          title="Final Accept"
+                          onClick={() => handleStatusUpdate(applicant._id, 'accepted')}
+                          disabled={updating}
+                        >
+                          <Check size={18} />
+                        </button>
+                      )}
                       <button
                         className="btn-icon btn-reject"
                         title="Reject"
@@ -301,12 +341,6 @@ const Applicants = () => {
                   {selectedApplicant.status.charAt(0).toUpperCase() + selectedApplicant.status.slice(1)}
                 </span>
               </div>
-              {selectedApplicant.matchPercentage !== undefined && (
-                <div className="info-row">
-                  <span className="info-label">Match Percentage:</span>
-                  <span className="info-value">{selectedApplicant.matchPercentage}%</span>
-                </div>
-              )}
             </div>
 
             {selectedApplicant.coverLetter && (
@@ -344,14 +378,28 @@ const Applicants = () => {
             <div className="modal-actions">
               {selectedApplicant.status !== 'accepted' && selectedApplicant.status !== 'rejected' && (
                 <>
-                  <button
-                    className="btn-accept"
-                    onClick={() => handleStatusUpdate(selectedApplicant._id, 'accepted')}
-                    disabled={updating}
-                  >
-                    <Check size={18} />
-                    Accept for Interview
-                  </button>
+                  {selectedApplicant.status !== 'interview' ? (
+                    <button
+                      className="btn-accept"
+                      onClick={() => {
+                        setShowModal(false);
+                        openInterviewModal(selectedApplicant);
+                      }}
+                      disabled={updating}
+                    >
+                      <Check size={18} />
+                      Schedule Interview
+                    </button>
+                  ) : (
+                    <button
+                      className="btn-accept"
+                      onClick={() => handleStatusUpdate(selectedApplicant._id, 'accepted')}
+                      disabled={updating}
+                    >
+                      <Check size={18} />
+                      Final Accept
+                    </button>
+                  )}
                   <button
                     className="btn-reject-full"
                     onClick={() => handleStatusUpdate(selectedApplicant._id, 'rejected')}
@@ -366,6 +414,84 @@ const Applicants = () => {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Interview Details Modal */}
+      {showInterviewModal && selectedApplicant && (
+        <div className="modal-overlay" onClick={() => setShowInterviewModal(false)}>
+          <div className="modal-content interview-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Schedule Interview</h2>
+              <button className="modal-close" onClick={() => setShowInterviewModal(false)}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <form onSubmit={handleInterviewSubmit} className="interview-form">
+              <div className="form-group">
+                <label>Date</label>
+                <input
+                  type="date"
+                  required
+                  value={interviewDetails.date}
+                  onChange={(e) => setInterviewDetails({ ...interviewDetails, date: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Time</label>
+                <input
+                  type="time"
+                  required
+                  value={interviewDetails.time}
+                  onChange={(e) => setInterviewDetails({ ...interviewDetails, time: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Type</label>
+                <select
+                  value={interviewDetails.type}
+                  onChange={(e) => setInterviewDetails({ ...interviewDetails, type: e.target.value })}
+                >
+                  <option value="online">Online</option>
+                  <option value="in-person">In-Person</option>
+                  <option value="phone">Phone</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>{interviewDetails.type === 'online' ? 'Meeting Link' : 'Location'}</label>
+                <input
+                  type="text"
+                  required
+                  placeholder={interviewDetails.type === 'online' ? 'e.g. Zoom/Google Meet Link' : 'Office Address'}
+                  value={interviewDetails.location}
+                  onChange={(e) => setInterviewDetails({ ...interviewDetails, location: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Message to Candidate (Optional)</label>
+                <textarea
+                  rows="3"
+                  value={interviewDetails.message}
+                  onChange={(e) => setInterviewDetails({ ...interviewDetails, message: e.target.value })}
+                ></textarea>
+              </div>
+
+              <div className="modal-actions">
+                <button type="submit" className="btn-accept" disabled={updating}>
+                  {updating ? 'Scheduling...' : 'Confirm Interview'}
+                </button>
+                <button type="button" className="btn-close" onClick={() => setShowInterviewModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

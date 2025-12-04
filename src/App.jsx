@@ -14,6 +14,7 @@ import AdminLayout from './layouts/AdminLayout';
 // Company Pages
 import CompanyDashboard from './pages/company/Dashboard';
 import CompanyPostJob from './pages/company/PostJob';
+import CompanyEditJob from './pages/company/EditJob';
 import CompanyApplicants from './pages/company/Applicants';
 import CompanyAIAnalyze from './pages/company/AIAnalyzeCandidates';
 
@@ -52,6 +53,7 @@ function App() {
             >
               <Route path="dashboard" element={<CompanyDashboard />} />
               <Route path="post-job" element={<CompanyPostJob />} />
+              <Route path="edit-job/:id" element={<CompanyEditJob />} />
               <Route path="applications" element={<CompanyApplicants />} />
               <Route path="ai-analyze" element={<CompanyAIAnalyze />} />
               <Route index element={<Navigate to="dashboard" replace />} />

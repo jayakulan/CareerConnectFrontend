@@ -34,6 +34,7 @@ const Jobs = () => {
       const token = localStorage.getItem('token');
       if (!token) return; // User not logged in
 
+      // Fetch applied jobs
       const response = await fetch('http://localhost:5000/api/applications/seeker', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -45,8 +46,21 @@ const Jobs = () => {
         const jobIds = new Set(applications.map(app => app.job._id));
         setAppliedJobIds(jobIds);
       }
+
+      // Fetch saved jobs
+      const savedResponse = await fetch('http://localhost:5000/api/jobs/saved', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (savedResponse.ok) {
+        const saved = await savedResponse.json();
+        const savedIds = new Set(saved.map(job => job._id));
+        setSavedJobs(savedIds);
+      }
     } catch (error) {
-      console.error('Error fetching applied jobs:', error);
+      console.error('Error fetching user data:', error);
     }
   };
 
@@ -75,16 +89,36 @@ const Jobs = () => {
     }
   };
 
-  const toggleSaveJob = (jobId) => {
-    setSavedJobs(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(jobId)) {
-        newSet.delete(jobId);
-      } else {
-        newSet.add(jobId);
+  const toggleSaveJob = async (jobId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to save jobs');
+        return;
       }
-      return newSet;
-    });
+
+      const response = await fetch(`http://localhost:5000/api/jobs/${jobId}/save`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSavedJobs(prev => {
+          const newSet = new Set(prev);
+          if (data.isSaved) {
+            newSet.add(jobId);
+          } else {
+            newSet.delete(jobId);
+          }
+          return newSet;
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling saved job:', error);
+    }
   };
 
   // Helper function to format time ago

@@ -4,6 +4,11 @@ import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, LogIn } from "lucide-react";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import ContactUsPopup from "./ContactUsPopup";
+import InfoPopup from "./InfoPopup";
+import { aboutUsContent, termsOfServiceContent, privacyPolicyContent, careersContent } from "./popupContent";
 import "./Login.css";
 
 export default function Login() {
@@ -13,6 +18,13 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Popup states
+  const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
+  const [isAboutPopupOpen, setIsAboutPopupOpen] = useState(false);
+  const [isTermsPopupOpen, setIsTermsPopupOpen] = useState(false);
+  const [isPrivacyPopupOpen, setIsPrivacyPopupOpen] = useState(false);
+  const [isCareersPopupOpen, setIsCareersPopupOpen] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -65,104 +77,149 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container">
-      {/* Left Side - Image/Brand Section */}
-      <div className="login-left">
-        <div className="login-left-content">
-          <h2 className="login-left-title">Welcome to CareerConnect</h2>
-          <p className="login-left-description">
-            Your gateway to endless career opportunities. Connect with top companies and find your dream job today.
-          </p>
-        </div>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Navbar
+        onAboutClick={() => setIsAboutPopupOpen(true)}
+        onContactClick={() => setIsContactPopupOpen(true)}
+      />
 
-      {/* Right Side - Login Form Section */}
-      <div className="login-right">
-        <div className="login-form-wrapper">
-          <div className="login-header">
-            <div className="login-logo">
-              <div className="logo-icon">
-                <LogIn size={24} />
-              </div>
-              <span className="logo-text">CareerConnect</span>
-            </div>
-            <h1 className="login-title">Welcome Back</h1>
-            <p className="login-subtitle">Log in to your account to continue</p>
+      <div className="login-container">
+        {/* Left Side - Image/Brand Section */}
+        <div className="login-left">
+          <div className="login-left-content">
+            <h2 className="login-left-title">Welcome to CareerConnect</h2>
+            <p className="login-left-description">
+              Your gateway to endless career opportunities. Connect with top companies and find your dream job today.
+            </p>
           </div>
+        </div>
 
-          <form className="login-form" onSubmit={handleLogin}>
-            <div className="form-group">
-              <label className="form-label">Email Address</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="form-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+        {/* Right Side - Login Form Section */}
+        <div className="login-right">
+          <div className="login-form-wrapper">
+            <div className="login-header">
+              <div className="login-logo">
+                <div className="logo-icon">
+                  <LogIn size={24} />
+                </div>
+                <span className="logo-text">CareerConnect</span>
+              </div>
+              <h1 className="login-title">Welcome Back</h1>
+              <p className="login-subtitle">Log in to your account to continue</p>
+            </div>
+
+            <form className="login-form" onSubmit={handleLogin}>
+              <div className="form-group">
+                <label className="form-label">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="form-input"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Password</label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="form-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-footer">
+                <label className="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <span>Remember me</span>
+                </label>
+                <Link to="/forgot-password" className="forgot-password-link">
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <button type="submit" className="login-button">
+                Log In
+              </button>
+            </form>
+
+            <div className="divider">
+              <span>OR</span>
+            </div>
+
+            <div className="google-login-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error("Google Login Failed")}
+                useOneTap
               />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <div className="password-input-wrapper">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className="form-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <div className="form-footer">
-              <label className="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                <span>Remember me</span>
-              </label>
-              <Link to="/forgot-password" className="forgot-password-link">
-                Forgot Password?
+            <div className="signup-section">
+              Don't have an account?
+              <Link to="/signup" className="signup-link">
+                Sign up
               </Link>
             </div>
-
-            <button type="submit" className="login-button">
-              Log In
-            </button>
-          </form>
-
-          <div className="divider">
-            <span>OR</span>
-          </div>
-
-          <div className="google-login-wrapper">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => toast.error("Google Login Failed")}
-              useOneTap
-            />
-          </div>
-
-          <div className="signup-section">
-            Don't have an account?
-            <Link to="/signup" className="signup-link">
-              Sign up
-            </Link>
           </div>
         </div>
       </div>
+
+      <Footer
+        onContactClick={() => setIsContactPopupOpen(true)}
+        onAboutClick={() => setIsAboutPopupOpen(true)}
+        onTermsClick={() => setIsTermsPopupOpen(true)}
+        onPrivacyClick={() => setIsPrivacyPopupOpen(true)}
+        onCareersClick={() => setIsCareersPopupOpen(true)}
+      />
+
+      {/* All Popups */}
+      <ContactUsPopup
+        isOpen={isContactPopupOpen}
+        onClose={() => setIsContactPopupOpen(false)}
+      />
+      <InfoPopup
+        isOpen={isAboutPopupOpen}
+        onClose={() => setIsAboutPopupOpen(false)}
+        title="About Us"
+        content={aboutUsContent}
+      />
+      <InfoPopup
+        isOpen={isTermsPopupOpen}
+        onClose={() => setIsTermsPopupOpen(false)}
+        title="Terms of Service"
+        content={termsOfServiceContent}
+      />
+      <InfoPopup
+        isOpen={isPrivacyPopupOpen}
+        onClose={() => setIsPrivacyPopupOpen(false)}
+        title="Privacy Policy"
+        content={privacyPolicyContent}
+      />
+      <InfoPopup
+        isOpen={isCareersPopupOpen}
+        onClose={() => setIsCareersPopupOpen(false)}
+        title="Career Opportunities"
+        content={careersContent}
+      />
     </div>
   );
 }

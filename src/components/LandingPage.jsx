@@ -6,7 +6,7 @@ import { Users, Briefcase, Shield, Facebook, Twitter, Linkedin, ArrowRight, Chec
 import Navbar from "./Navbar";
 import ContactUsPopup from "./ContactUsPopup";
 import InfoPopup from "./InfoPopup";
-import { aboutUsContent, termsOfServiceContent, privacyPolicyContent } from "./popupContent";
+import { aboutUsContent, termsOfServiceContent, privacyPolicyContent, careersContent } from "./popupContent";
 import "./landingpage.css";
 import heroBg from "../assets/hero-bg.png";
 
@@ -223,7 +223,7 @@ function Newsletter() {
 }
 
 // ===== FOOTER COMPONENT =====
-function Footer({ onContactClick, onAboutClick, onTermsClick, onPrivacyClick }) {
+function Footer({ onContactClick, onAboutClick, onTermsClick, onPrivacyClick, onCareersClick }) {
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -263,6 +263,20 @@ function Footer({ onContactClick, onAboutClick, onTermsClick, onPrivacyClick }) 
                   ) : link.label === "About Us" ? (
                     <button
                       onClick={onAboutClick}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      {link.label}
+                    </button>
+                  ) : link.label === "Careers" ? (
+                    <button
+                      onClick={onCareersClick}
                       style={{
                         background: 'none',
                         border: 'none',
@@ -365,6 +379,7 @@ export default function LandingPage() {
   const [isAboutPopupOpen, setIsAboutPopupOpen] = useState(false);
   const [isTermsPopupOpen, setIsTermsPopupOpen] = useState(false);
   const [isPrivacyPopupOpen, setIsPrivacyPopupOpen] = useState(false);
+  const [isCareersPopupOpen, setIsCareersPopupOpen] = useState(false);
 
   const handleOpenContactPopup = () => {
     setIsContactPopupOpen(true);
@@ -398,6 +413,14 @@ export default function LandingPage() {
     setIsPrivacyPopupOpen(false);
   };
 
+  const handleOpenCareersPopup = () => {
+    setIsCareersPopupOpen(true);
+  };
+
+  const handleCloseCareersPopup = () => {
+    setIsCareersPopupOpen(false);
+  };
+
   return (
     <main>
       <Navbar
@@ -413,6 +436,7 @@ export default function LandingPage() {
         onAboutClick={handleOpenAboutPopup}
         onTermsClick={handleOpenTermsPopup}
         onPrivacyClick={handleOpenPrivacyPopup}
+        onCareersClick={handleOpenCareersPopup}
       />
 
       {/* All Popups */}
@@ -437,6 +461,12 @@ export default function LandingPage() {
         onClose={handleClosePrivacyPopup}
         title="Privacy Policy"
         content={privacyPolicyContent}
+      />
+      <InfoPopup
+        isOpen={isCareersPopupOpen}
+        onClose={handleCloseCareersPopup}
+        title="Career Opportunities"
+        content={careersContent}
       />
     </main>
   )
