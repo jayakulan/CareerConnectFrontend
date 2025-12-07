@@ -269,6 +269,31 @@ const Applicants = () => {
                   >
                     <Eye size={18} />
                   </button>
+
+
+                  {/* Status Change Dropdown - Always visible for testing */}
+                  <select
+                    className="status-select"
+                    value={applicant.status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value;
+                      if (newStatus === 'interview') {
+                        openInterviewModal(applicant);
+                      } else {
+                        handleStatusUpdate(applicant._id, newStatus);
+                      }
+                    }}
+                    disabled={updating}
+                  >
+                    <option value="applied">Applied</option>
+                    <option value="reviewing">Reviewing</option>
+                    <option value="interview">Interview</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+
+
+                  {/* Quick Action Buttons */}
                   {applicant.status !== 'accepted' && applicant.status !== 'rejected' && (
                     <>
                       {applicant.status !== 'interview' ? (
