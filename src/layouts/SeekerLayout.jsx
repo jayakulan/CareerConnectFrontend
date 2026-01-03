@@ -7,6 +7,7 @@ import JobDetails from '../pages/seeker/JobDetails';
 import Profile from '../pages/seeker/Profile';
 import AIResumeCheck from '../pages/seeker/AIResumeCheck';
 import NotificationDropdown from '../components/NotificationDropdown';
+import logo from '../assets/image.png';
 
 const SeekerLayout = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const SeekerLayout = () => {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="logo">
-            <div className="logo-icon">C</div>
+            <img src={logo} alt="CareerConnect Logo" className="logo-image" />
             <span className="logo-text">CareerConnect</span>
           </div>
         </div>
@@ -123,18 +124,10 @@ const SeekerLayout = () => {
           gap: 12px;
         }
 
-        .logo-icon {
-          width: 40px;
+        .logo-image {
           height: 40px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 20px;
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+          width: auto;
+          object-fit: contain;
         }
 
         .logo-text {

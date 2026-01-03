@@ -89,15 +89,10 @@
   margin-bottom: 24px;
 }
 
-.logo-icon {
-  width: 40px;
+.login-logo-image {
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+  width: auto;
+  object-fit: contain;
 }
 
 .logo-text {

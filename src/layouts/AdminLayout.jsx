@@ -4,6 +4,7 @@ import { LayoutDashboard, Users, Briefcase, LogOut } from 'lucide-react';
 import Dashboard from '../pages/admin/Dashboard';
 import AdminUsers from '../pages/admin/Users';
 import Jobs from '../pages/admin/Jobs';
+import logo from '../assets/image.png';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -26,7 +27,7 @@ const AdminLayout = () => {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="logo">
-            <div className="logo-icon">C</div>
+            <img src={logo} alt="CareerConnect Logo" className="logo-image" />
             <span className="logo-text">CareerConnect</span>
           </div>
         </div>
@@ -115,18 +116,10 @@ const AdminLayout = () => {
           gap: 12px;
         }
 
-        .logo-icon {
-          width: 40px;
+        .logo-image {
           height: 40px;
-          background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 20px;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+          width: auto;
+          object-fit: contain;
         }
 
         .logo-text {

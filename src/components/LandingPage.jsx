@@ -9,6 +9,7 @@ import InfoPopup from "./InfoPopup";
 import { aboutUsContent, termsOfServiceContent, privacyPolicyContent, careersContent } from "./popupContent";
 import "./landingpage.css";
 import heroBg from "../assets/hero-bg.png";
+import logo from "../assets/image.png";
 
 // ===== TESTIMONIALS DATA =====
 const testimonials = [
@@ -232,7 +233,7 @@ function Footer({ onContactClick, onAboutClick, onTermsClick, onPrivacyClick, on
           {/* Brand */}
           <div className="footer-brand">
             <div className="footer-brand-logo">
-              <div className="footer-brand-circle">C</div>
+              <img src={logo} alt="CareerConnect Logo" className="footer-brand-image" />
               <span className="footer-brand-text">CareerConnect</span>
             </div>
             <p className="footer-brand-description">

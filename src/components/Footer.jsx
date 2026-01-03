@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Twitter, Facebook, Linkedin } from 'lucide-react';
 import './Footer.css';
+import logo from '../assets/image.png';
 
 export default function Footer({ onContactClick, onAboutClick, onTermsClick, onPrivacyClick, onCareersClick }) {
     const footerLinks = {
@@ -27,7 +28,7 @@ export default function Footer({ onContactClick, onAboutClick, onTermsClick, onP
                     {/* Brand */}
                     <div className="footer-brand">
                         <div className="footer-brand-logo">
-                            <div className="footer-brand-circle">C</div>
+                            <img src={logo} alt="CareerConnect Logo" className="footer-brand-image" />
                             <span className="footer-brand-text">CareerConnect</span>
                         </div>
                         <p className="footer-brand-description">

@@ -10,6 +10,7 @@ import ContactUsPopup from "./ContactUsPopup";
 import InfoPopup from "./InfoPopup";
 import { aboutUsContent, termsOfServiceContent, privacyPolicyContent, careersContent } from "./popupContent";
 import "./Login.css";
+import logo from "../assets/image.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -99,9 +100,7 @@ export default function Login() {
           <div className="login-form-wrapper">
             <div className="login-header">
               <div className="login-logo">
-                <div className="logo-icon">
-                  <LogIn size={24} />
-                </div>
+                <img src={logo} alt="CareerConnect Logo" className="login-logo-image" />
                 <span className="logo-text">CareerConnect</span>
               </div>
               <h1 className="login-title">Welcome Back</h1>

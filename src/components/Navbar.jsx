@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import InfoPopup from "./InfoPopup";
 import { companiesContent, careersContent } from "./popupContent";
 import "./landingpage.css";
+import logo from "../assets/image.png";
 
 function Navbar({ onAboutClick }) {
   const [companiesPopupOpen, setCompaniesPopupOpen] = useState(false);
@@ -14,7 +15,7 @@ function Navbar({ onAboutClick }) {
         <div className="navbar-container">
           {/* Logo */}
           <Link to="/" className="navbar-logo">
-            <div className="navbar-logo-circle">C</div>
+            <img src={logo} alt="CareerConnect Logo" className="navbar-logo-image" />
             <span className="navbar-logo-text">CareerConnect</span>
           </Link>
 

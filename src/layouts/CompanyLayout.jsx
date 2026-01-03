@@ -8,6 +8,7 @@ import Applicants from '../pages/company/Applicants';
 import AIAnalyzeCandidates from '../pages/company/AIAnalyzeCandidates';
 import NotificationDropdown from '../components/NotificationDropdown';
 import EditCompanyProfileModal from '../components/EditCompanyProfileModal';
+import logo from '../assets/image.png';
 
 const CompanyLayout = () => {
   const location = useLocation();
@@ -74,7 +75,7 @@ const CompanyLayout = () => {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="logo">
-            <div className="logo-icon">C</div>
+            <img src={logo} alt="CareerConnect Logo" className="logo-image" />
             <span className="logo-text">CareerConnect</span>
           </div>
         </div>
@@ -180,18 +181,10 @@ const CompanyLayout = () => {
           gap: 12px;
         }
 
-        .logo-icon {
-          width: 40px;
+        .logo-image {
           height: 40px;
-          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 20px;
-          box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+          width: auto;
+          object-fit: contain;
         }
 
         .logo-text {
