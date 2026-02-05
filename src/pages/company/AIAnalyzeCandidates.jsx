@@ -56,7 +56,7 @@ const AIAnalyzeCandidates = () => {
     formData.append('jobDescription', jobDescription);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/ai/analyze', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/ai/analyze`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

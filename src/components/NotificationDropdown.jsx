@@ -28,7 +28,7 @@ const NotificationDropdown = () => {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            const response = await fetch('http://localhost:5000/api/notifications', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -47,7 +47,7 @@ const NotificationDropdown = () => {
     const markAsRead = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -66,7 +66,7 @@ const NotificationDropdown = () => {
     const markAllAsRead = async () => {
         try {
             const token = localStorage.getItem('token');
-            await fetch('http://localhost:5000/api/notifications/read-all', {
+            await fetch(`${import.meta.env.VITE_API_URL}/notifications/read-all`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -84,7 +84,7 @@ const NotificationDropdown = () => {
         e.stopPropagation();
         try {
             const token = localStorage.getItem('token');
-            await fetch(`http://localhost:5000/api/notifications/${id}`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/notifications/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

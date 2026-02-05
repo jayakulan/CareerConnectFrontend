@@ -36,8 +36,8 @@ const Applicants = () => {
       }
 
       const url = filterStatus !== 'all'
-        ? `http://localhost:5000/api/applications/company?status=${filterStatus}`
-        : 'http://localhost:5000/api/applications/company';
+        ? `${import.meta.env.VITE_API_URL}/applications/company?status=${filterStatus}`
+        : `${import.meta.env.VITE_API_URL}/applications/company`;
 
       const response = await fetch(url, {
         headers: {
@@ -70,7 +70,7 @@ const Applicants = () => {
         body.interviewDetails = details;
       }
 
-      const response = await fetch(`http://localhost:5000/api/applications/${applicationId}/status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/${applicationId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ const Applicants = () => {
   const handleViewResume = async (applicationId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/applications/${applicationId}/resume`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/${applicationId}/resume`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

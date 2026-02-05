@@ -35,7 +35,7 @@ const Jobs = () => {
       if (!token) return; // User not logged in
 
       // Fetch applied jobs
-      const response = await fetch('http://localhost:5000/api/applications/seeker', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/seeker`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -48,7 +48,7 @@ const Jobs = () => {
       }
 
       // Fetch saved jobs
-      const savedResponse = await fetch('http://localhost:5000/api/jobs/saved', {
+      const savedResponse = await fetch(`${import.meta.env.VITE_API_URL}/jobs/saved`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,8 +70,8 @@ const Jobs = () => {
       setError(null);
 
       const url = keyword
-        ? `http://localhost:5000/api/jobs?keyword=${encodeURIComponent(keyword)}`
-        : 'http://localhost:5000/api/jobs';
+        ? `${import.meta.env.VITE_API_URL}/jobs?keyword=${encodeURIComponent(keyword)}`
+        : `${import.meta.env.VITE_API_URL}/jobs`;
 
       const response = await fetch(url);
 
@@ -97,7 +97,7 @@ const Jobs = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/jobs/${jobId}/save`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/jobs/${jobId}/save`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -212,7 +212,7 @@ const Jobs = () => {
       formData.append('resume', resumeFile);
       formData.append('coverLetter', coverLetter);
 
-      const response = await fetch(`http://localhost:5000/api/applications/apply/${selectedJob._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/apply/${selectedJob._id}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

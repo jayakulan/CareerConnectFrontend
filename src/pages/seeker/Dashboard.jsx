@@ -28,7 +28,7 @@ const SeekerDashboard = () => {
       if (!token) return;
 
       // Fetch applications
-      const response = await fetch('http://localhost:5000/api/applications/seeker', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/seeker`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -105,7 +105,7 @@ const SeekerDashboard = () => {
       setWithdrawing(applicationId);
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`http://localhost:5000/api/applications/${applicationId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/${applicationId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -138,7 +138,7 @@ const SeekerDashboard = () => {
   const handleInterviewResponse = async (status) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/applications/${selectedInterview._id}/interview-response`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/applications/${selectedInterview._id}/interview-response`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

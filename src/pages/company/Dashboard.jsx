@@ -39,7 +39,7 @@ const Dashboard = () => {
         const activeJobsCount = jobs.filter(job => job.status === 'published').length;
 
         // Fetch applications using the same endpoint as Applicants page
-        const applicationsResponse = await fetch('http://localhost:5000/api/applications/company', {
+        const applicationsResponse = await fetch(`${import.meta.env.VITE_API_URL}/applications/company`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

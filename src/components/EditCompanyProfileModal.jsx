@@ -59,7 +59,7 @@ const EditCompanyProfileModal = ({ isOpen, onClose, onUpdate, initialData }) => 
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/profile', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

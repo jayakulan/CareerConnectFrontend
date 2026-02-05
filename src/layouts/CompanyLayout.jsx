@@ -25,7 +25,7 @@ const CompanyLayout = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch('http://localhost:5000/api/users/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

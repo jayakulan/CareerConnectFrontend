@@ -17,7 +17,7 @@ const JobDetails = () => {
     const fetchJobDetails = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/api/jobs/${id}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/jobs/${id}`);
 
             if (!response.ok) {
                 throw new Error('Failed to fetch job details');
